@@ -1,0 +1,15 @@
+export class InvoiceFields {
+    static readonly id = 'Id'
+    static readonly invoiceNo = 'InvoiceNo'
+    static readonly totalAmount = 'TotalAmount'
+    static readonly vat = 'Vat'
+    static readonly totalAmountIncludingVat = 'TotalAmountIncludingVat'
+    static readonly customerId = 'CustomerId'
+    static readonly customer = 'Customer'
+    static readonly salesman = 'Salesman'
+    static readonly salesmanId = 'SalesmanId'
+    static readonly status = 'Status'
+    static readonly paymentDate = 'PaymentDate'
+    static readonly createDate = 'CreateDate'
+    static readonly updateDate = 'UpdateDate'
+}

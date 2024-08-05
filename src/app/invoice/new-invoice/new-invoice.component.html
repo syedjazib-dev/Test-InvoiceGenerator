@@ -1,0 +1,1660 @@
+<!-- Add User Modal -->
+<app-floating-modal [floatingModalId]="addCustomerModalId" title="Add Customer">
+    <form [formGroup]="customerAddForm" (ngSubmit)="createCustomer()" class="xs:w-80 w-full flex flex-col gap-4">
+        <app-input label="Name" [control]="newName" name="Name" type="text" autocomplete="Name" [isRequired]="true"
+            placeholder="Name"></app-input>
+        <app-input label="Phone No." [control]="newPhone" name="Phone No." type="tel" placeholder="Phone No."
+            [isRequired]="true" format="00000 00000"></app-input>
+        <app-input label="Email" [control]="newEmail" name="Email" type="text" placeholder="Email"></app-input>
+        <app-input label="TRN" [control]="newTRN" name="TRN" type="text" placeholder="TRN"></app-input>
+        <app-textarea label="Address" [control]="newAddress" name="Address" placeholder="Address"
+            [isRequired]="true"></app-textarea>
+        <button [disabled]="isCreatingUser" type="submit"
+            class="text-white py-2 sm:py-3 rounded bg-gradient-to-r from-themeblue-800 to-themeblue-900 w-full mt-2 text-base">
+            <app-dot-wave-loader colorCode="#FFFFFF" class="flex justify-center items-center my-1 mt-1.5"
+                *ngIf="isCreatingUser ; else createUsertext" />
+            <ng-template #createUsertext> Create Customer </ng-template>
+        </button>
+    </form>
+</app-floating-modal>
+
+
+<main class="sm:mx-14 mx-8 mt-8 mb-36">
+
+    <div
+        class="flex flex-col justify-between items-center gap-4 shadow-[0_0px_20px_1px_rgba(0,0,0,0.1)] rounded-xl mt-5 border-[1px] border-gray-200">
+
+        <div
+            class="rounded-t-xl sm:px-8 px-4 p-4 flex justify-between items-center text-gray-800 text-2xl font-bold w-full  border-b-[2px] border-gray-200  bg-themeblue-200 ">
+            <p>INVOICE</p>
+            <p *ngIf="invoice != null" class="sm:mr-2">#{{invoice!.invoiceNo}}</p>
+        </div>
+
+
+        <div class="sm:px-8 px-4 py-3 pb-8 flex flex-col w-full gap-4">
+            <!-- Customer -->
+            <div class="flex sm:flex-nowrap flex-wrap w-full gap-4 justify-center mt-5">
+                <div class="flex flex-col items-start sm:w-1/2 w-full">
+                    <label class="text-base text-gray-500">
+                        Customer&nbsp;<span class="text-danger">*</span>
+                    </label>
+
+                    <!-- Customer Dropdown -->
+                    <app-floating-dropdown [floatingDropdownId]="customerFloatingDropdownId" class="float-left">
+                        <button floating-dropdown-title
+                            (click)="openFloatingDropdown($event, customerFloatingDropdownId)"
+                            class="floating-dropdown-btn relative text-base rounded-xl xl:w-[42vw] lg:w-[40.5vw] md:w-[38vw] sm:w-[35.5vw] xs:w-[72vw] 2xs:w-[68vw] w-[66vw] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black font-semibold ">
+                            {{selectedCustomer != null ? selectedCustomer.name :'--Select Customer--'}} <i
+                                class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                        </button>
+                        <div floating-dropdown-menu
+                            class="floating-dropdown-btn absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 xl:w-[42vw] lg:w-[40.5vw] md:w-[38vw] sm:w-[35.5vw] xs:w-[72vw] 2xs:w-[68vw] w-[66vw] left-0 divide-y-2 divide-gray-100 "
+                            style="right: -1.2rem;">
+
+                            <!-- Search -->
+                            <div class=" floating-dropdown-btn flex items-center w-full group mb-2">
+                                <div
+                                    class="floating-dropdown-btn  flex-none absolute  flex items-center justify-center ps-3 pointer-events-none">
+                                    <i
+                                        class="floating-dropdown-btn bx bx-search text-xl text-gray-500 group-hover:text-themeblue-400"></i>
+                                </div>
+                                <input type="search"
+                                    class="floating-dropdown-btn form-input pl-10 rounded-lg border-transparent focus:border-transparent bg-themeblue-50 text-themeblue-900"
+                                    placeholder="Search..." [(ngModel)]="customerFilterText"
+                                    (input)="filterCustomerData($event)">
+                            </div>
+
+                            <!-- Customer List -->
+                            <div class="max-h-[15rem] divide-y-2 divide-gray-100 overflow-auto">
+                                <div *ngFor="let customer of customersSelectOptions" (click)="selectCustomer(customer)">
+                                    <div [ngClass]="{'text-gray-300' : customer == selectedCustomer}"
+                                        class="cursor-pointer flex flex-col lg:flex-row justify-between items-start py-3 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap  w-full">
+                                        <p class="font-semibold text-gray-800">{{customer.name}}</p>
+                                        <p>{{customer.phone}}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Add customer btn -->
+                            <div (click)="openAddCustomerForm($event)"
+                                class="flex justify-center items-center text-themeblue-800 text-base gap-2 font-semibold px-3 pt-4 pb-3 cursor-pointer">
+                                <i class="ph ph-plus-circle text-2xl"></i>
+                                <p>Add Customer</p>
+                            </div>
+                        </div>
+                    </app-floating-dropdown>
+                </div>
+                <app-input [control]="phone" class="sm:w-1/2 w-full" label="Customer's Phone No."
+                    name="Customer Phone No." type="text" placeholder="Phone No."></app-input>
+            </div>
+
+            <div class="flex sm:flex-nowrap flex-wrap w-full gap-4 justify-center">
+                <app-input [control]="address" class="sm:w-1/2 w-full" label="Customer's Address" name="Address"
+                    type="text" placeholder="Address"></app-input>
+                <app-input [control]="email" class="sm:w-1/2 w-full" label="Customer's Email" name="Email" type="text"
+                    placeholder="Email"></app-input>
+            </div>
+            <div class="flex sm:flex-nowrap flex-wrap w-full gap-4">
+                <app-input [control]="trn" class="sm:w-1/2 w-11/12" label="Customer's TRN" name="TRN" type="text"
+                    placeholder="TRN"></app-input>
+                <div class="sm:w-1/2 w-11/12"></div>
+            </div>
+
+
+            <!-- Items -->
+            <div
+                class="flex flex-col justify-center items-center gap-0 bg-themeblue-200 rounded-xl w-full px-6 py-5 mt-3">
+                <div class="grid-cols-12 gap-4  rounded-xl mb-1 2xl:grid hidden w-full">
+                    <div class="col-span-1 flex items-center ">
+                        <label class="text-gray-500 text-base font-semibold">
+                            Lot No
+                        </label>
+                    </div>
+                    <div class="col-span-3">
+                        <label class="text-gray-500 text-base font-semibold justify-center">
+                            Description&nbsp;<span class="text-danger">*</span>
+                        </label>
+                    </div>
+                    <div class="col-span-2 flex items-center justify-center">
+                        <label class="text-gray-500 text-base font-semibold">
+                            Quantity&nbsp;<span class="text-danger">*</span>
+                        </label>
+                    </div>
+                    <div class="col-span-2 flex items-center justify-center">
+                        <label class="text-gray-500 text-base font-semibold">
+                            Price&nbsp;<span class="text-danger">*</span>
+                        </label>
+                    </div>
+                    <div class="col-span-2 flex items-center justify-center">
+                        <label class="text-gray-500 text-base font-semibold">
+                            Amount&nbsp;<span class="text-danger">*</span>
+                        </label>
+                    </div>
+                    <div class="col-span-1 flex items-center justify-center">
+                        <label class="text-gray-500 text-base font-semibold">
+                            Status&nbsp;<span class="text-danger">*</span>
+                        </label>
+                    </div>
+                    <div class="col-span-1"></div>
+
+                </div>
+
+                <!-- Row -->
+                <div *ngFor="let item of items; let i = index" class="flex flex-col justify-start xl:mb-0 mb-0 w-full">
+                    <div *ngIf="i != 0" class="border-t-[2px] border-themeblue-250 w-full rounded  mt-4"></div>
+                    <label class="text-base text-gray-500 block mb-1 mt-4">
+                        Item {{i+1}}
+                    </label>
+                    <!-- level - 0 -->
+                    <div class="grid grid-cols-12 xl:grid-row-1 grid-row-2 gap-4 rounded-xl">
+                        <div class="2xl:col-span-1 xl:col-span-3 sm:col-span-4 col-span-11">
+                            <div>
+                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                    Lot No
+                                </label>
+                                <app-input [control]="item.lotNo" name="Lot No" type="text"
+                                    placeholder="Lot No"></app-input>
+                            </div>
+                        </div>
+
+                        <div class="2xl:col-span-3 xl:col-span-4 sm:col-span-7 col-span-11">
+                            <div>
+                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                    Description&nbsp;<span class="text-danger">*</span>
+                                </label>
+                                <app-input [control]="item.description" name="Description" type="text"
+                                    placeholder="Description"></app-input>
+                            </div>
+                        </div>
+
+                        <div class="2xl:col-span-2 xl:col-span-4 lg:col-span-5 md:col-span-5 col-span-11">
+                            <div>
+                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                    Quantity&nbsp;<span class="text-danger">*</span>
+                                </label>
+                                <div class="flex justify-between items-center gap-1">
+                                    <app-input [error]="item.isQuantityError"
+                                        [errorMessage]="item.quantityErrorMessange" [control]="item.weightCarats"
+                                        name="Quantity" type="number" [placeholder]="item.quantityUnit" min="0"
+                                        class="w-full"></app-input>
+                                    <app-floating-dropdown [floatingDropdownId]="item.quantityDropDownId"
+                                        class="float-left">
+                                        <button floating-dropdown-title
+                                            (click)="openFloatingDropdown($event, item.quantityDropDownId)"
+                                            [ngClass]="{'floating-dropdown-btn':item.status != ItemStatus.Splitted}"
+                                            class="relative text-base rounded-xl w-[6rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                            {{item.quantityUnit}} <i
+                                                [ngClass]="{'floating-dropdown-btn':item.status != ItemStatus.Splitted}"
+                                                class="bx bx-chevron-down text-xl text-gray-500"></i>
+                                        </button>
+                                        <div floating-dropdown-menu
+                                            class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[6rem] left-0"
+                                            style="right: -1.2rem;">
+                                            <div *ngFor="let quatityCategoryType of quatityCategorySelectOptions"
+                                                (click)="selectQuantityCategory(quatityCategoryType, i)"
+                                                [ngClass]="{'text-gray-300' : quatityCategoryType == item.quantityUnit}"
+                                                class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                {{quatityCategoryType}}
+                                            </div>
+                                        </div>
+                                    </app-floating-dropdown>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="2xl:col-span-2  xl:col-span-4 lg:col-span-6 md:col-span-6 col-span-11">
+                            <div>
+                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                    Price&nbsp;<span class="text-danger">*</span>
+                                </label>
+                                <div class="flex justify-between items-center gap-1">
+                                    <app-input [control]="item.pricePerUnit" name="Price" type="number"
+                                        placeholder="Price" min="0" class="w-full"></app-input>
+                                    <app-floating-dropdown [floatingDropdownId]="item.pricePerUnitCurrancyDropDownId"
+                                        class="float-left">
+                                        <button floating-dropdown-title
+                                            (click)="openFloatingDropdown($event, item.pricePerUnitCurrancyDropDownId)"
+                                            [ngClass]="{'floating-dropdown-btn':item.status != ItemStatus.Splitted}"
+                                            class="relative text-base rounded-xl w-[5rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                            {{item.pricePerUnitCurrancy}} <i
+                                                [ngClass]="{'floating-dropdown-btn':item.status != ItemStatus.Splitted}"
+                                                class="bx bx-chevron-down text-xl text-gray-500"></i>
+                                        </button>
+                                        <div floating-dropdown-menu
+                                            class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[5rem] left-0"
+                                            style="right: -1.2rem;">
+                                            <div *ngFor="let curracyType of CurracySelectOptions"
+                                                (click)="selectPricePerCarateCurrency(curracyType, i)"
+                                                [ngClass]="{'text-gray-300' : curracyType == item.pricePerUnitCurrancy}"
+                                                class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                {{curracyType}}
+                                            </div>
+                                        </div>
+                                    </app-floating-dropdown>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="2xl:col-span-2 xl:col-span-5 lg:col-span-9 sm:col-span-8 xs:col-span-6 col-span-11">
+                            <div>
+                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                    Amount
+                                </label>
+                                <div
+                                    class="flex justify-between items-center border-[2px] rounded-lg bg-white w-full focus-within:border-gray-400  px-3 py-2 sm:px-4 sm:py-2 text-base">
+                                    <p
+                                        [ngClass]="{'text-gray-400' : amount(item)=='0.00', 'text-gray-800': amount(item)!='0.00'}">
+                                        {{amount(item)=='0.00' ? 'Amount' :amount(item) }}</p>
+                                    <p class=" text-base">AED</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="2xl:col-span-1 xl:col-span-1 lg:col-span-2 sm:col-span-3 xs:col-span-5 col-span-11">
+                            <div>
+                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                    Status&nbsp;<span class="text-danger">*</span>
+                                </label>
+                                <app-floating-dropdown [floatingDropdownId]="item.statusDropDownId" class="float-left">
+                                    <button floating-dropdown-title
+                                        (click)="openFloatingDropdown($event, item.statusDropDownId)"
+                                        class="floating-dropdown-btn relative text-base rounded-xl w-[8rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                        {{item.status}} <i
+                                            class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                                    </button>
+                                    <div floating-dropdown-menu
+                                        class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[8rem] left-0"
+                                        style="right: -1.2rem;">
+                                        <div *ngFor="let status of itemStatusOptions" (click)="selectStatus(status, i)"
+                                            [ngClass]="{'text-gray-300' : status == item.status, 'hidden': status == ItemStatus.Pending}"
+                                            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                            {{status}}
+                                        </div>
+                                    </div>
+                                </app-floating-dropdown>
+                            </div>
+                        </div>
+
+                        <div
+                            class="col-span-1 flex justify-center xl:items-center xl:row-end-2 row-start-1 row-end-3 col-start-12  px-3 py-2 lg:mx-8 sm:px-4 sm:py-2">
+                            <i (click)="removeItem(i)"
+                                class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-full text-gray-900 hover:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+                        </div>
+                    </div>
+
+                    <!-- level - 1 -->
+                    <div *ngIf="item.status == ItemStatus.Splitted" class="w-full">
+
+                        <!-- Add btn -->
+                        <div *ngFor="let splittedItem1 of item.splittedItems; let j = index"
+                            class="flex flex-col justify-start items-start 2xl:items-center 3xl:mt-0 xl:mb-0 mb-2 mt-6 w-full">
+                            <div class="flex flex-col sm:flex-row 2xl:items-center sm:gap-4 gap-2 w-full relative">
+                                <label
+                                    class="text-base text-white mb-1 sm:ml-2 ml-0 bg-item-level-1 rounded-full flex justify-center items-center  mt-1 2xl:mt-0 h-7 w-7">
+                                    {{j+1}}
+                                </label>
+                                <div (click)="addItem(i)" *ngIf="item.splittedItems.length == (j+1)"
+                                    class="absolute flex justify-center items-center rounded-full bg-item-level-1 w-7 h-7 text-white text-2xl cursor-pointer 2xl:right-0 2xl:left-auto 2xl:bottom-3 bottom-5 right-2 sm:left-4 sm:bottom-2">
+                                    <i class='bx bx-plus text-lg'></i>
+                                </div>
+                                <div
+                                    class="grid grid-cols-12 xl:grid-row-1 grid-row-2 gap-x-4 gap-y-1 rounded-xl w-full">
+                                    <div class="2xl:col-span-1 xl:col-span-3 sm:col-span-4 col-span-11">
+                                        <div>
+                                            <label class="text-base text-gray-500 block 2xl:hidden">
+                                                Lot No
+                                            </label>
+                                            <app-input [control]="splittedItem1.lotNo" name="Lot No" type="text"
+                                                placeholder="Lot No"></app-input>
+                                        </div>
+                                    </div>
+
+                                    <div class="2xl:col-span-3 xl:col-span-4 sm:col-span-7 col-span-11">
+                                        <div>
+                                            <label class="text-base text-gray-500 block 2xl:hidden">
+                                                Description&nbsp;<span class="text-danger">*</span>
+                                            </label>
+                                            <app-input [control]="splittedItem1.description" name="Description"
+                                                type="text" placeholder="Description"></app-input>
+                                        </div>
+                                    </div>
+
+                                    <div class="2xl:col-span-2 xl:col-span-4 lg:col-span-5 md:col-span-5 col-span-11">
+                                        <div>
+                                            <label class="text-base text-gray-500 block 2xl:hidden">
+                                                Quantity&nbsp;<span class="text-danger">*</span>
+                                            </label>
+                                            <div class="flex justify-between items-center gap-1">
+                                                <app-input [error]="splittedItem1.isQuantityError"
+                                                    [errorMessage]="splittedItem1.quantityErrorMessange"
+                                                    [control]="splittedItem1.weightCarats" name="Quantity" type="number"
+                                                    [placeholder]="splittedItem1.quantityUnit" min="0"
+                                                    [max]="item.weightCarats.value!" class="w-full"></app-input>
+                                                <app-floating-dropdown
+                                                    [floatingDropdownId]=" splittedItem1.quantityDropDownId"
+                                                    class="float-left">
+                                                    <button floating-dropdown-title
+                                                        (click)="openFloatingDropdown($event, splittedItem1.quantityDropDownId)"
+                                                        class=" relative text-base rounded-xl w-[6rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                        {{splittedItem1.quantityUnit}} <i
+                                                            class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                    </button>
+                                                    <div floating-dropdown-menu
+                                                        class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[6rem] left-0"
+                                                        style="right: -1.2rem;">
+                                                        <div *ngFor="let quatityCategoryType of quatityCategorySelectOptions"
+                                                            (click)="selectQuantityCategory(quatityCategoryType, i, j)"
+                                                            [ngClass]="{'text-gray-300' : quatityCategoryType == splittedItem1.quantityUnit}"
+                                                            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                            {{quatityCategoryType}}
+                                                        </div>
+                                                    </div>
+                                                </app-floating-dropdown>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="2xl:col-span-2 xl:col-span-4 lg:col-span-6 md:col-span-6 col-span-11">
+                                        <div>
+                                            <label class="text-base text-gray-500 block 2xl:hidden">
+                                                Price&nbsp;<span class="text-danger">*</span>
+                                            </label>
+                                            <div class="flex justify-between items-center gap-1">
+                                                <app-input [control]="splittedItem1.pricePerUnit" name="Price"
+                                                    type="number" placeholder="Price" min="0"
+                                                    class="w-full"></app-input>
+                                                <app-floating-dropdown
+                                                    [floatingDropdownId]="splittedItem1.pricePerUnitCurrancyDropDownId"
+                                                    class="float-left">
+                                                    <button floating-dropdown-title
+                                                        (click)="openFloatingDropdown($event, splittedItem1.pricePerUnitCurrancyDropDownId)"
+                                                        class=" relative text-base rounded-xl w-[5rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                        {{splittedItem1.pricePerUnitCurrancy}}
+                                                        <i class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                    </button>
+                                                    <div floating-dropdown-menu
+                                                        class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[5rem] left-0"
+                                                        style="right: -1.2rem;">
+                                                        <div *ngFor="let curracyType of CurracySelectOptions"
+                                                            (click)="selectPricePerCarateCurrency(curracyType, i, j)"
+                                                            [ngClass]="{'text-gray-300' : curracyType == splittedItem1.pricePerUnitCurrancy}"
+                                                            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                            {{curracyType}}
+                                                        </div>
+                                                    </div>
+                                                </app-floating-dropdown>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="2xl:col-span-2 xl:col-span-5 lg:col-span-9 sm:col-span-8 xs:col-span-6 col-span-11">
+                                        <div>
+                                            <label class="text-base text-gray-500 block 2xl:hidden">
+                                                Amount
+                                            </label>
+                                            <div
+                                                class="flex justify-between items-center border-[2px] rounded-lg bg-white w-full focus-within:border-gray-400  px-3 py-2 sm:px-4 sm:py-2 text-base">
+                                                <p
+                                                    [ngClass]="{'text-gray-400' : amount(splittedItem1)=='0.00', 'text-gray-800':amount(splittedItem1)!='0.00'}">
+                                                    {{amount(splittedItem1)=='0.00' ? 'Amount' :amount(splittedItem1) }}
+                                                </p>
+                                                <p class=" text-base">AED</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="2xl:col-span-1 xl:col-span-1 lg:col-span-2 sm:col-span-3 xs:col-span-5 col-span-11">
+                                        <div>
+                                            <label class="text-base text-gray-500 block 2xl:hidden">
+                                                Status&nbsp;<span class="text-danger">*</span>
+                                            </label>
+                                            <app-floating-dropdown [floatingDropdownId]="splittedItem1.statusDropDownId"
+                                                class="float-left">
+                                                <button floating-dropdown-title
+                                                    (click)="openFloatingDropdown($event, splittedItem1.statusDropDownId)"
+                                                    class="floating-dropdown-btn relative text-base rounded-xl w-[8rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                    {{splittedItem1.status}} <i
+                                                        class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                                                </button>
+                                                <div floating-dropdown-menu
+                                                    class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[8rem] left-0"
+                                                    style="right: -1.2rem;">
+                                                    <div *ngFor="let status of itemStatusOptions"
+                                                        (click)="selectStatus(status, i, j)"
+                                                        [ngClass]="{'text-gray-300' : status == splittedItem1.status, 'hidden': status == ItemStatus.Pending}"
+                                                        class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                        {{status}}
+                                                    </div>
+                                                </div>
+                                            </app-floating-dropdown>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="col-span-1 flex justify-center xl:items-center xl:row-end-2 row-start-1 row-end-3 col-start-12  px-3 py-2 lg:mx-8 sm:px-4 sm:py-2">
+                                        <i (click)="removeItem(i, j)"
+                                            class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-full text-gray-900 hover:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- level - 2 -->
+                            <div *ngIf="splittedItem1.status == ItemStatus.Splitted" class="w-full">
+
+                                <!-- Add btn -->
+                                <div *ngFor="let splittedItem2 of splittedItem1.splittedItems; let k = index"
+                                    class="flex flex-col justify-start items-start 3xl:items-center 3xl:mt-0 xl:mb-0 mb-2 mt-6  w-full">
+
+                                    <div
+                                        class="flex flex-col sm:flex-row 3xl:items-center sm:gap-4 gap-2  w-full relative">
+                                        <label
+                                            class="text-base text-white mb-1 sm:ml-10 ml-0 bg-item-level-2 rounded-full flex justify-center items-center  mt-1 3xl:mt-0 h-7 w-7">
+                                            {{k+1}}
+                                        </label>
+                                        <div (click)="addItem(i, j)" *ngIf="splittedItem1.splittedItems.length == (k+1)"
+                                            class="absolute flex justify-center items-center rounded-full bg-item-level-2 w-7 h-7 text-white text-2xl cursor-pointer 3xl:right-0 3xl:left-auto 3xl:bottom-3 bottom-5 right-2 sm:left-10 sm:bottom-2">
+                                            <i class='bx bx-plus text-lg'></i>
+                                        </div>
+                                        <div
+                                            class="grid grid-cols-12 xl:grid-row-1 grid-row-2 gap-x-4 gap-y-1 rounded-xl w-full">
+                                            <div class="3xl:col-span-1 2xl:col-span-3 sm:col-span-4 col-span-11">
+                                                <div>
+                                                    <label class="text-base text-gray-500 block 3xl:hidden">
+                                                        Lot No
+                                                    </label>
+                                                    <app-input [control]="splittedItem2.lotNo" name="Lot No" type="text"
+                                                        placeholder="Lot No"></app-input>
+                                                </div>
+                                            </div>
+
+                                            <div class="3xl:col-span-3 2xl:col-span-4 sm:col-span-7 col-span-11">
+                                                <div>
+                                                    <label class="text-base text-gray-500 block 3xl:hidden">
+                                                        Description&nbsp;<span class="text-danger">*</span>
+                                                    </label>
+                                                    <app-input [control]="splittedItem2.description" name="Description"
+                                                        type="text" placeholder="Description"></app-input>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                class="3xl:col-span-2 2xl:col-span-4 lg:col-span-5 md:col-span-5 col-span-11">
+                                                <div>
+                                                    <label class="text-base text-gray-500 block 3xl:hidden">
+                                                        Quantity&nbsp;<span class="text-danger">*</span>
+                                                    </label>
+                                                    <div class="flex justify-between items-center gap-1">
+                                                        <app-input [error]="splittedItem2.isQuantityError"
+                                                            [errorMessage]="splittedItem2.quantityErrorMessange"
+                                                            [control]="splittedItem2.weightCarats" name="Quantity"
+                                                            type="number" [placeholder]="splittedItem2.quantityUnit"
+                                                            min="0" [max]="item.weightCarats.value!"
+                                                            class="w-full"></app-input>
+                                                        <app-floating-dropdown
+                                                            [floatingDropdownId]=" splittedItem2.quantityDropDownId"
+                                                            class="float-left">
+                                                            <button floating-dropdown-title
+                                                                (click)="openFloatingDropdown($event, splittedItem2.quantityDropDownId)"
+                                                                class=" relative text-base rounded-xl w-[6rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                {{splittedItem2.quantityUnit}} <i
+                                                                    class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                            </button>
+                                                            <div floating-dropdown-menu
+                                                                class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[6rem] left-0"
+                                                                style="right: -1.2rem;">
+                                                                <div *ngFor="let quatityCategoryType of quatityCategorySelectOptions"
+                                                                    (click)="selectQuantityCategory(quatityCategoryType, i, j, k)"
+                                                                    [ngClass]="{'text-gray-300' : quatityCategoryType == splittedItem2.quantityUnit}"
+                                                                    class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                    {{quatityCategoryType}}
+                                                                </div>
+                                                            </div>
+                                                        </app-floating-dropdown>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                class="3xl:col-span-2 2xl:col-span-4 lg:col-span-6 md:col-span-6 col-span-11">
+                                                <div>
+                                                    <label class="text-base text-gray-500 block 3xl:hidden">
+                                                        Price&nbsp;<span class="text-danger">*</span>
+                                                    </label>
+                                                    <div class="flex justify-between items-center gap-1">
+                                                        <app-input [control]="splittedItem2.pricePerUnit" name="Price"
+                                                            type="number" placeholder="Price" min="0"
+                                                            class="w-full"></app-input>
+                                                        <app-floating-dropdown
+                                                            [floatingDropdownId]="splittedItem2.pricePerUnitCurrancyDropDownId"
+                                                            class="float-left">
+                                                            <button floating-dropdown-title
+                                                                (click)="openFloatingDropdown($event, splittedItem2.pricePerUnitCurrancyDropDownId)"
+                                                                class=" relative text-base rounded-xl w-[5rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                {{splittedItem2.pricePerUnitCurrancy}}
+                                                                <i
+                                                                    class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                            </button>
+                                                            <div floating-dropdown-menu
+                                                                class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[5rem] left-0"
+                                                                style="right: -1.2rem;">
+                                                                <div *ngFor="let curracyType of CurracySelectOptions"
+                                                                    (click)="selectPricePerCarateCurrency(curracyType, i, j, k)"
+                                                                    [ngClass]="{'text-gray-300' : curracyType == splittedItem2.pricePerUnitCurrancy}"
+                                                                    class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                    {{curracyType}}
+                                                                </div>
+                                                            </div>
+                                                        </app-floating-dropdown>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                class="3xl:col-span-2 2xl:col-span-5 lg:col-span-9 sm:col-span-8 xs:col-span-6 col-span-11">
+                                                <div>
+                                                    <label class="text-base text-gray-500 block 3xl:hidden">
+                                                        Amount
+                                                    </label>
+                                                    <div
+                                                        class="flex justify-between items-center border-[2px] rounded-lg bg-white w-full focus-within:border-gray-400  px-3 py-2 sm:px-4 sm:py-2 text-base">
+                                                        <p
+                                                            [ngClass]="{'text-gray-400' : amount(splittedItem2)=='0.00', 'text-gray-800':amount(splittedItem2)!='0.00'}">
+                                                            {{amount(splittedItem2)=='0.00' ? 'Amount'
+                                                            :amount(splittedItem2) }}</p>
+                                                        <p class=" text-base">AED</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                class="3xl:col-span-1 2xl:col-span-1 lg:col-span-2 sm:col-span-3 xs:col-span-5 col-span-11">
+                                                <div>
+                                                    <label class="text-base text-gray-500 block 3xl:hidden">
+                                                        Status&nbsp;<span class="text-danger">*</span>
+                                                    </label>
+                                                    <app-floating-dropdown
+                                                        [floatingDropdownId]="splittedItem2.statusDropDownId"
+                                                        class="float-left">
+                                                        <button floating-dropdown-title
+                                                            (click)="openFloatingDropdown($event, splittedItem2.statusDropDownId)"
+                                                            class="floating-dropdown-btn relative text-base rounded-xl w-[8rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                            {{splittedItem2.status}} <i
+                                                                class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                                                        </button>
+                                                        <div floating-dropdown-menu
+                                                            class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[8rem] left-0"
+                                                            style="right: -1.2rem;">
+                                                            <div *ngFor="let status of itemStatusOptions"
+                                                                (click)="selectStatus(status, i, j, k)"
+                                                                [ngClass]="{'text-gray-300' : status == splittedItem2.status, 'hidden': status == ItemStatus.Pending}"
+                                                                class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                {{status}}
+                                                            </div>
+                                                        </div>
+                                                    </app-floating-dropdown>
+                                                </div>
+                                            </div>
+
+                                            <div
+                                                class="col-span-1 flex justify-center xl:items-center xl:row-end-2 row-start-1 row-end-3 col-start-12  px-3 py-2 lg:mx-8 sm:px-4 sm:py-2">
+                                                <i (click)="removeItem(i, j, k)"
+                                                    class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-full text-gray-900 hover:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- level - 3 -->
+                                    <div *ngIf="splittedItem2.status == ItemStatus.Splitted" class="w-full">
+
+                                        <!-- Add btn -->
+                                        <div *ngFor="let splittedItem3 of splittedItem2.splittedItems; let l = index"
+                                            class="flex flex-col justify-start items-start 3xl:items-center 3xl:mt-0 xl:mb-0 mb-2 mt-6 w-full">
+
+                                            <div
+                                                class="flex flex-col sm:flex-row 3xl:items-center sm:gap-4 gap-2  w-full relative">
+                                                <label
+                                                    class="text-base text-white mb-1 sm:ml-20 ml-0 bg-item-level-3 rounded-full flex justify-center items-center  mt-1 3xl:mt-0 h-7 w-7">
+                                                    {{l+1}}
+                                                </label>
+                                                <div (click)="addItem(i, j, k)"
+                                                    *ngIf="splittedItem2.splittedItems.length == (l+1)"
+                                                    class="absolute flex justify-center items-center rounded-full bg-item-level-3 w-7 h-7 text-white text-2xl cursor-pointer 3xl:right-0 3xl:left-auto 3xl:bottom-3 bottom-5 right-2 sm:left-[5rem] sm:bottom-2">
+                                                    <i class='bx bx-plus text-lg'></i>
+                                                </div>
+                                                <div
+                                                    class="grid grid-cols-12 xl:grid-row-1 grid-row-2 gap-x-4 gap-y-1 rounded-xl w-full">
+                                                    <div
+                                                        class="3xl:col-span-1 2xl:col-span-3 sm:col-span-4 col-span-11">
+                                                        <div>
+                                                            <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                Lot No
+                                                            </label>
+                                                            <app-input [control]="splittedItem3.lotNo" name="Lot No"
+                                                                type="text" placeholder="Lot No"></app-input>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="3xl:col-span-3 2xl:col-span-4 sm:col-span-7 col-span-11">
+                                                        <div>
+                                                            <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                Description&nbsp;<span class="text-danger">*</span>
+                                                            </label>
+                                                            <app-input [control]="splittedItem3.description"
+                                                                name="Description" type="text"
+                                                                placeholder="Description"></app-input>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="3xl:col-span-2 2xl:col-span-4 lg:col-span-5 md:col-span-5 col-span-11">
+                                                        <div>
+                                                            <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                Quantity&nbsp;<span class="text-danger">*</span>
+                                                            </label>
+                                                            <div class="flex justify-between items-center gap-1">
+                                                                <app-input [error]="splittedItem3.isQuantityError"
+                                                                    [errorMessage]="splittedItem3.quantityErrorMessange"
+                                                                    [control]="splittedItem3.weightCarats"
+                                                                    name="Quantity" type="number"
+                                                                    [placeholder]="splittedItem3.quantityUnit" min="0"
+                                                                    [max]="item.weightCarats.value!"
+                                                                    class="w-full"></app-input>
+                                                                <app-floating-dropdown
+                                                                    [floatingDropdownId]=" splittedItem3.quantityDropDownId"
+                                                                    class="float-left">
+                                                                    <button floating-dropdown-title
+                                                                        (click)="openFloatingDropdown($event, splittedItem3.quantityDropDownId)"
+                                                                        class=" relative text-base rounded-xl w-[6rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                        {{splittedItem3.quantityUnit}} <i
+                                                                            class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                                    </button>
+                                                                    <div floating-dropdown-menu
+                                                                        class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[6rem] left-0"
+                                                                        style="right: -1.2rem;">
+                                                                        <div *ngFor="let quatityCategoryType of quatityCategorySelectOptions"
+                                                                            (click)="selectQuantityCategory(quatityCategoryType, i, j, k, l)"
+                                                                            [ngClass]="{'text-gray-300' : quatityCategoryType == splittedItem3.quantityUnit}"
+                                                                            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                            {{quatityCategoryType}}
+                                                                        </div>
+                                                                    </div>
+                                                                </app-floating-dropdown>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="3xl:col-span-2 2xl:col-span-4 lg:col-span-6 md:col-span-6 col-span-11">
+                                                        <div>
+                                                            <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                Price&nbsp;<span class="text-danger">*</span>
+                                                            </label>
+                                                            <div class="flex justify-between items-center gap-1">
+                                                                <app-input [control]="splittedItem3.pricePerUnit"
+                                                                    name="Price" type="number" placeholder="Price"
+                                                                    min="0" class="w-full"></app-input>
+                                                                <app-floating-dropdown
+                                                                    [floatingDropdownId]="splittedItem3.pricePerUnitCurrancyDropDownId"
+                                                                    class="float-left">
+                                                                    <button floating-dropdown-title
+                                                                        (click)="openFloatingDropdown($event, splittedItem3.pricePerUnitCurrancyDropDownId)"
+                                                                        class=" relative text-base rounded-xl w-[5rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                        {{splittedItem3.pricePerUnitCurrancy}}
+                                                                        <i
+                                                                            class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                                    </button>
+                                                                    <div floating-dropdown-menu
+                                                                        class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[5rem] left-0"
+                                                                        style="right: -1.2rem;">
+                                                                        <div *ngFor="let curracyType of CurracySelectOptions"
+                                                                            (click)="selectPricePerCarateCurrency(curracyType, i, j, k, l)"
+                                                                            [ngClass]="{'text-gray-300' : curracyType == splittedItem2.pricePerUnitCurrancy}"
+                                                                            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                            {{curracyType}}
+                                                                        </div>
+                                                                    </div>
+                                                                </app-floating-dropdown>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="3xl:col-span-2 2xl:col-span-5 lg:col-span-9 sm:col-span-8 xs:col-span-6 col-span-11">
+                                                        <div>
+                                                            <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                Amount
+                                                            </label>
+                                                            <div
+                                                                class="flex justify-between items-center border-[2px] rounded-lg bg-white w-full focus-within:border-gray-400  px-3 py-2 sm:px-4 sm:py-2 text-base">
+                                                                <p
+                                                                    [ngClass]="{'text-gray-400' : amount(splittedItem3)=='0.00', 'text-gray-800':amount(splittedItem3)!='0.00'}">
+                                                                    {{amount(splittedItem3)=='0.00' ? 'Amount'
+                                                                    :amount(splittedItem3) }}</p>
+                                                                <p class=" text-base">AED</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="3xl:col-span-1 2xl:col-span-1 lg:col-span-2 sm:col-span-3 xs:col-span-5 col-span-11">
+                                                        <div>
+                                                            <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                Status&nbsp;<span class="text-danger">*</span>
+                                                            </label>
+                                                            <app-floating-dropdown
+                                                                [floatingDropdownId]="splittedItem3.statusDropDownId"
+                                                                class="float-left">
+                                                                <button floating-dropdown-title
+                                                                    (click)="openFloatingDropdown($event, splittedItem3.statusDropDownId)"
+                                                                    class="floating-dropdown-btn relative text-base rounded-xl w-[8rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                    {{splittedItem3.status}} <i
+                                                                        class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                                                                </button>
+                                                                <div floating-dropdown-menu
+                                                                    class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[8rem] left-0"
+                                                                    style="right: -1.2rem;">
+                                                                    <div *ngFor="let status of itemStatusOptions"
+                                                                        (click)="selectStatus(status, i, j, k, l)"
+                                                                        [ngClass]="{'text-gray-300' : status == splittedItem3.status, 'hidden': status == ItemStatus.Splitted ||  status == ItemStatus.Pending}"
+                                                                        class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                        {{status}}
+                                                                    </div>
+                                                                </div>
+                                                            </app-floating-dropdown>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        class="col-span-1 flex justify-center xl:items-center xl:row-end-2 row-start-1 row-end-3 col-start-12  px-3 py-2 lg:mx-8 sm:px-4 sm:py-2">
+                                                        <i (click)="removeItem(i, j, k, l)"
+                                                            class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-full text-gray-900 hover:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+
+                <!-- Add Item Btn -->
+                <div class="flex flex-col justify-between items-center gap-2 mt-4">
+                    <div (click)="addItem()"
+                        class="flex justify-center items-center rounded-full bg-themeblue-800 w-10 h-10 text-white text-2xl cursor-pointer">
+                        <i class='bx bx-plus'></i>
+                    </div>
+                    <p class="text-themeblue-800 text-base font-semibold">Add Item</p>
+                </div>
+            </div>
+
+
+
+            <!-- Approvals -->
+            <div *ngFor="let importedAprovalIttrable of importedapprovalsList;let  approvalIndex = index"
+                class="flex flex-col items-start mt-3 ">
+                <div class="flex justify-between items-center w-full">
+                    <label class="text-base text-gray-500">
+                        Approvals&nbsp;&nbsp;#{{importedAprovalIttrable.approval.approvalNo}}
+                    </label>
+                    <i (click)="removeImportedApproval(approvalIndex)"
+                        class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-full text-gray-900 hover:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+                </div>
+
+                <!-- Approval Items -->
+                <div
+                    class="flex flex-col justify-center items-center gap-0 bg-themeblue-200 rounded-xl w-full px-6 py-5 mt-3">
+                    <div class="grid-cols-12 gap-4  rounded-xl mb-1 2xl:grid hidden w-full">
+                        <div class="col-span-1 flex items-center ">
+                            <label class="text-gray-500 text-base font-semibold">
+                                Lot No
+                            </label>
+                        </div>
+                        <div class="col-span-3">
+                            <label class="text-gray-500 text-base font-semibold justify-center">
+                                Description&nbsp;<span class="text-danger">*</span>
+                            </label>
+                        </div>
+                        <div class="col-span-2 flex items-center justify-center">
+                            <label class="text-gray-500 text-base font-semibold">
+                                Quantity&nbsp;<span class="text-danger">*</span>
+                            </label>
+                        </div>
+                        <div class="col-span-2 flex items-center justify-center">
+                            <label class="text-gray-500 text-base font-semibold">
+                                Price&nbsp;<span class="text-danger">*</span>
+                            </label>
+                        </div>
+                        <div class="col-span-2 flex items-center justify-center">
+                            <label class="text-gray-500 text-base font-semibold">
+                                Amount&nbsp;<span class="text-danger">*</span>
+                            </label>
+                        </div>
+                        <div class="col-span-1 flex items-center justify-center">
+                            <label class="text-gray-500 text-base font-semibold">
+                                Status&nbsp;<span class="text-danger">*</span>
+                            </label>
+                        </div>
+                        <div class="col-span-1"></div>
+
+                    </div>
+
+                    <!-- Row -->
+                    <div *ngFor="let item of importedAprovalIttrable.items; let i = index"
+                        class="flex flex-col justify-start xl:mb-0 mb-0 w-full">
+                        <div *ngIf="i != 0" class="border-t-[2px] border-themeblue-250 w-full rounded  mt-4"></div>
+                        <label class="text-base text-gray-500 block  mb-1 mt-4">
+                            Item {{i+1}}
+                        </label>
+                        <!-- level - 0 -->
+                        <div class="grid grid-cols-12 xl:grid-row-1 grid-row-2 gap-4 rounded-xl">
+                            <div class="2xl:col-span-1 xl:col-span-3 sm:col-span-4 col-span-11">
+                                <div>
+                                    <label class="text-base text-gray-500 block 2xl:hidden">
+                                        Lot No
+                                    </label>
+                                    <app-input [control]="item.lotNo" name="Lot No" type="text"
+                                        placeholder="Lot No"></app-input>
+                                </div>
+                            </div>
+
+                            <div class="2xl:col-span-3 xl:col-span-4 sm:col-span-7 col-span-11">
+                                <div>
+                                    <label class="text-base text-gray-500 block 2xl:hidden">
+                                        Description&nbsp;<span class="text-danger">*</span>
+                                    </label>
+                                    <app-input [control]="item.description" name="Description" type="text"
+                                        placeholder="Description"></app-input>
+                                </div>
+                            </div>
+
+                            <div class="2xl:col-span-2 xl:col-span-4 lg:col-span-5 md:col-span-5 col-span-11">
+                                <div>
+                                    <label class="text-base text-gray-500 block 2xl:hidden">
+                                        Quantity&nbsp;<span class="text-danger">*</span>
+                                    </label>
+                                    <div class="flex justify-between items-center gap-1">
+                                        <app-input [error]="item.isQuantityError"
+                                            [errorMessage]="item.quantityErrorMessange" [control]="item.weightCarats"
+                                            name="Quantity" type="number" [placeholder]="item.quantityUnit" min="0"
+                                            class="w-full"></app-input>
+                                        <app-floating-dropdown [floatingDropdownId]="item.quantityDropDownId"
+                                            class="float-left">
+                                            <button floating-dropdown-title
+                                                (click)="openFloatingDropdown($event, item.quantityDropDownId)"
+                                                [ngClass]="{'floating-dropdown-btn':item.status != ItemStatus.Splitted}"
+                                                class="relative text-base rounded-xl w-[6rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                {{item.quantityUnit}} <i
+                                                    [ngClass]="{'floating-dropdown-btn':item.status != ItemStatus.Splitted}"
+                                                    class="bx bx-chevron-down text-xl text-gray-500"></i>
+                                            </button>
+                                            <div floating-dropdown-menu
+                                                class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[6rem] left-0"
+                                                style="right: -1.2rem;">
+                                                <div *ngFor="let quatityCategoryType of quatityCategorySelectOptions"
+                                                    (click)="selectQuantityCategoryApproval(quatityCategoryType, approvalIndex,i)"
+                                                    [ngClass]="{'text-gray-300' : quatityCategoryType == item.quantityUnit}"
+                                                    class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                    {{quatityCategoryType}}
+                                                </div>
+                                            </div>
+                                        </app-floating-dropdown>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="2xl:col-span-2  xl:col-span-4 lg:col-span-6 md:col-span-6 col-span-11">
+                                <div>
+                                    <label class="text-base text-gray-500 block 2xl:hidden">
+                                        Price&nbsp;<span class="text-danger">*</span>
+                                    </label>
+                                    <div class="flex justify-between items-center gap-1">
+                                        <app-input [control]="item.pricePerUnit" name="Price" type="number"
+                                            placeholder="Price" min="0" class="w-full"></app-input>
+                                        <app-floating-dropdown
+                                            [floatingDropdownId]="item.pricePerUnitCurrancyDropDownId"
+                                            class="float-left">
+                                            <button floating-dropdown-title
+                                                (click)="openFloatingDropdown($event, item.pricePerUnitCurrancyDropDownId)"
+                                                [ngClass]="{'floating-dropdown-btn':item.status != ItemStatus.Splitted}"
+                                                class="relative text-base rounded-xl w-[5rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                {{item.pricePerUnitCurrancy}} <i
+                                                    [ngClass]="{'floating-dropdown-btn':item.status != ItemStatus.Splitted}"
+                                                    class="bx bx-chevron-down text-xl text-gray-500"></i>
+                                            </button>
+                                            <div floating-dropdown-menu
+                                                class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[5rem] left-0"
+                                                style="right: -1.2rem;">
+                                                <div *ngFor="let curracyType of CurracySelectOptions"
+                                                    (click)="selectPricePerCarateCurrencyApproval(curracyType, approvalIndex, i)"
+                                                    [ngClass]="{'text-gray-300' : curracyType == item.pricePerUnitCurrancy}"
+                                                    class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                    {{curracyType}}
+                                                </div>
+                                            </div>
+                                        </app-floating-dropdown>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="2xl:col-span-2 xl:col-span-5 lg:col-span-9 sm:col-span-8 xs:col-span-6 col-span-11">
+                                <div>
+                                    <label class="text-base text-gray-500 block 2xl:hidden">
+                                        Amount
+                                    </label>
+                                    <div
+                                        class="flex justify-between items-center border-[2px] rounded-lg bg-white w-full focus-within:border-gray-400  px-3 py-2 sm:px-4 sm:py-2 text-base">
+                                        <p
+                                            [ngClass]="{'text-gray-400' : amount(item)=='0.00', 'text-gray-800': amount(item)!='0.00'}">
+                                            {{amount(item)=='0.00' ? 'Amount' :amount(item) }}</p>
+                                        <p class=" text-base">AED</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="2xl:col-span-1 xl:col-span-1 lg:col-span-2 sm:col-span-3 xs:col-span-5 col-span-11">
+                                <div>
+                                    <label class="text-base text-gray-500 block 2xl:hidden">
+                                        Status&nbsp;<span class="text-danger">*</span>
+                                    </label>
+                                    <app-floating-dropdown [floatingDropdownId]="item.statusDropDownId"
+                                        class="float-left">
+                                        <button floating-dropdown-title
+                                            (click)="openFloatingDropdown($event, item.statusDropDownId)"
+                                            class="floating-dropdown-btn relative text-base rounded-xl w-[8rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                            {{item.status}} <i
+                                                class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                                        </button>
+                                        <div floating-dropdown-menu
+                                            class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[8rem] left-0"
+                                            style="right: -1.2rem;">
+                                            <div *ngFor="let status of itemStatusOptions"
+                                                (click)="selectStatusApproval(status, approvalIndex,i)"
+                                                [ngClass]="{'text-gray-300' : status == item.status}"
+                                                class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                {{status}}
+                                            </div>
+                                        </div>
+                                    </app-floating-dropdown>
+                                </div>
+                            </div>
+
+                            <div
+                                class="col-span-1 flex justify-center xl:items-center xl:row-end-2 row-start-1 row-end-3 col-start-12  px-3 py-2 lg:mx-8 sm:px-4 sm:py-2">
+                                <i (click)="removeItemFromApproval(approvalIndex, i)"
+                                    class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-full text-gray-900 hover:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+                            </div>
+                        </div>
+
+                        <!-- level - 1 -->
+                        <div *ngIf="item.status == ItemStatus.Splitted" class="w-full">
+
+                            <!-- Add btn -->
+                            <div *ngFor="let splittedItem1 of item.splittedItems; let j = index"
+                                class="flex flex-col justify-start items-start 2xl:items-center 3xl:mt-0 xl:mb-0 mb-2 mt-6 w-full">
+                                <div class="flex flex-col sm:flex-row 2xl:items-center sm:gap-4 gap-2 w-full relative">
+                                    <label
+                                        class="text-base text-white mb-1 sm:ml-2 ml-0 bg-item-level-1 rounded-full flex justify-center items-center  mt-1 2xl:mt-0 h-7 w-7">
+                                        {{j+1}}
+                                    </label>
+                                    <div (click)="addItemToApproval(approvalIndex, i)" *ngIf="item.splittedItems.length == (j+1)"
+                                        class="absolute flex justify-center items-center rounded-full bg-item-level-1 w-7 h-7 text-white text-2xl cursor-pointer 2xl:right-0 2xl:left-auto 2xl:bottom-3 bottom-5 right-2 sm:left-4 sm:bottom-2">
+                                        <i class='bx bx-plus text-lg'></i>
+                                    </div>
+                                    <div
+                                        class="grid grid-cols-12 xl:grid-row-1 grid-row-2 gap-x-4 gap-y-1 rounded-xl w-full">
+                                        <div class="2xl:col-span-1 xl:col-span-3 sm:col-span-4 col-span-11">
+                                            <div>
+                                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                                    Lot No
+                                                </label>
+                                                <app-input [control]="splittedItem1.lotNo" name="Lot No" type="text"
+                                                    placeholder="Lot No"></app-input>
+                                            </div>
+                                        </div>
+
+                                        <div class="2xl:col-span-3 xl:col-span-4 sm:col-span-7 col-span-11">
+                                            <div>
+                                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                                    Description&nbsp;<span class="text-danger">*</span>
+                                                </label>
+                                                <app-input [control]="splittedItem1.description" name="Description"
+                                                    type="text" placeholder="Description"></app-input>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="2xl:col-span-2 xl:col-span-4 lg:col-span-5 md:col-span-5 col-span-11">
+                                            <div>
+                                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                                    Quantity&nbsp;<span class="text-danger">*</span>
+                                                </label>
+                                                <div class="flex justify-between items-center gap-1">
+                                                    <app-input [error]="splittedItem1.isQuantityError"
+                                                        [errorMessage]="splittedItem1.quantityErrorMessange"
+                                                        [control]="splittedItem1.weightCarats" name="Quantity"
+                                                        type="number" [placeholder]="splittedItem1.quantityUnit" min="0"
+                                                        [max]="item.weightCarats.value!" class="w-full"></app-input>
+                                                    <app-floating-dropdown
+                                                        [floatingDropdownId]=" splittedItem1.quantityDropDownId"
+                                                        class="float-left">
+                                                        <button floating-dropdown-title
+                                                            (click)="openFloatingDropdown($event, splittedItem1.quantityDropDownId)"
+                                                            class=" relative text-base rounded-xl w-[6rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                            {{splittedItem1.quantityUnit}} <i
+                                                                class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                        </button>
+                                                        <div floating-dropdown-menu
+                                                            class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[6rem] left-0"
+                                                            style="right: -1.2rem;">
+                                                            <div *ngFor="let quatityCategoryType of quatityCategorySelectOptions"
+                                                                (click)="selectQuantityCategoryApproval(quatityCategoryType, approvalIndex,i, j)"
+                                                                [ngClass]="{'text-gray-300' : quatityCategoryType == splittedItem1.quantityUnit}"
+                                                                class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                {{quatityCategoryType}}
+                                                            </div>
+                                                        </div>
+                                                    </app-floating-dropdown>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="2xl:col-span-2 xl:col-span-4 lg:col-span-6 md:col-span-6 col-span-11">
+                                            <div>
+                                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                                    Price&nbsp;<span class="text-danger">*</span>
+                                                </label>
+                                                <div class="flex justify-between items-center gap-1">
+                                                    <app-input [control]="splittedItem1.pricePerUnit" name="Price"
+                                                        type="number" placeholder="Price" min="0"
+                                                        class="w-full"></app-input>
+                                                    <app-floating-dropdown
+                                                        [floatingDropdownId]="splittedItem1.pricePerUnitCurrancyDropDownId"
+                                                        class="float-left">
+                                                        <button floating-dropdown-title
+                                                            (click)="openFloatingDropdown($event, splittedItem1.pricePerUnitCurrancyDropDownId)"
+                                                            class=" relative text-base rounded-xl w-[5rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                            {{splittedItem1.pricePerUnitCurrancy}}
+                                                            <i class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                        </button>
+                                                        <div floating-dropdown-menu
+                                                            class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[5rem] left-0"
+                                                            style="right: -1.2rem;">
+                                                            <div *ngFor="let curracyType of CurracySelectOptions"
+                                                                (click)="selectPricePerCarateCurrencyApproval(curracyType, approvalIndex,i, j)"
+                                                                [ngClass]="{'text-gray-300' : curracyType == splittedItem1.pricePerUnitCurrancy}"
+                                                                class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                {{curracyType}}
+                                                            </div>
+                                                        </div>
+                                                    </app-floating-dropdown>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="2xl:col-span-2 xl:col-span-5 lg:col-span-9 sm:col-span-8 xs:col-span-6 col-span-11">
+                                            <div>
+                                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                                    Amount
+                                                </label>
+                                                <div
+                                                    class="flex justify-between items-center border-[2px] rounded-lg bg-white w-full focus-within:border-gray-400  px-3 py-2 sm:px-4 sm:py-2 text-base">
+                                                    <p
+                                                        [ngClass]="{'text-gray-400' : amount(splittedItem1)=='0.00', 'text-gray-800':amount(splittedItem1)!='0.00'}">
+                                                        {{amount(splittedItem1)=='0.00' ? 'Amount'
+                                                        :amount(splittedItem1) }}
+                                                    </p>
+                                                    <p class=" text-base">AED</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="2xl:col-span-1 xl:col-span-1 lg:col-span-2 sm:col-span-3 xs:col-span-5 col-span-11">
+                                            <div>
+                                                <label class="text-base text-gray-500 block 2xl:hidden">
+                                                    Status&nbsp;<span class="text-danger">*</span>
+                                                </label>
+                                                <app-floating-dropdown
+                                                    [floatingDropdownId]="splittedItem1.statusDropDownId"
+                                                    class="float-left">
+                                                    <button floating-dropdown-title
+                                                        (click)="openFloatingDropdown($event, splittedItem1.statusDropDownId)"
+                                                        class="floating-dropdown-btn relative text-base rounded-xl w-[8rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                        {{splittedItem1.status}} <i
+                                                            class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                                                    </button>
+                                                    <div floating-dropdown-menu
+                                                        class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[8rem] left-0"
+                                                        style="right: -1.2rem;">
+                                                        <div *ngFor="let status of itemStatusOptions"
+                                                            (click)="selectStatusApproval(status, approvalIndex,i, j)"
+                                                            [ngClass]="{'text-gray-300' : status == splittedItem1.status}"
+                                                            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                            {{status}}
+                                                        </div>
+                                                    </div>
+                                                </app-floating-dropdown>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="col-span-1 flex justify-center xl:items-center xl:row-end-2 row-start-1 row-end-3 col-start-12  px-3 py-2 lg:mx-8 sm:px-4 sm:py-2">
+                                            <i (click)="removeItemFromApproval(approvalIndex, i, j)"
+                                                class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-full text-gray-900 hover:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- level - 2 -->
+                                <div *ngIf="splittedItem1.status == ItemStatus.Splitted" class="w-full">
+
+                                    <!-- Add btn -->
+                                    <div *ngFor="let splittedItem2 of splittedItem1.splittedItems; let k = index"
+                                        class="flex flex-col justify-start items-start 3xl:items-center 3xl:mt-0 xl:mb-0 mb-2 mt-6  w-full">
+
+                                        <div
+                                            class="flex flex-col sm:flex-row 3xl:items-center sm:gap-4 gap-2  w-full relative">
+                                            <label
+                                                class="text-base text-white mb-1 sm:ml-10 ml-0 bg-item-level-2 rounded-full flex justify-center items-center  mt-1 3xl:mt-0 h-7 w-7">
+                                                {{k+1}}
+                                            </label>
+                                            <div (click)="addItemToApproval(approvalIndex, i, j)"
+                                                *ngIf="splittedItem1.splittedItems.length == (k+1)"
+                                                class="absolute flex justify-center items-center rounded-full bg-item-level-2 w-7 h-7 text-white text-2xl cursor-pointer 3xl:right-0 3xl:left-auto 3xl:bottom-3 bottom-5 right-2 sm:left-10 sm:bottom-2">
+                                                <i class='bx bx-plus text-lg'></i>
+                                            </div>
+                                            <div
+                                                class="grid grid-cols-12 xl:grid-row-1 grid-row-2 gap-x-4 gap-y-1 rounded-xl w-full">
+                                                <div class="3xl:col-span-1 2xl:col-span-3 sm:col-span-4 col-span-11">
+                                                    <div>
+                                                        <label class="text-base text-gray-500 block 3xl:hidden">
+                                                            Lot No
+                                                        </label>
+                                                        <app-input [control]="splittedItem2.lotNo" name="Lot No"
+                                                            type="text" placeholder="Lot No"></app-input>
+                                                    </div>
+                                                </div>
+
+                                                <div class="3xl:col-span-3 2xl:col-span-4 sm:col-span-7 col-span-11">
+                                                    <div>
+                                                        <label class="text-base text-gray-500 block 3xl:hidden">
+                                                            Description&nbsp;<span class="text-danger">*</span>
+                                                        </label>
+                                                        <app-input [control]="splittedItem2.description"
+                                                            name="Description" type="text"
+                                                            placeholder="Description"></app-input>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    class="3xl:col-span-2 2xl:col-span-4 lg:col-span-5 md:col-span-5 col-span-11">
+                                                    <div>
+                                                        <label class="text-base text-gray-500 block 3xl:hidden">
+                                                            Quantity&nbsp;<span class="text-danger">*</span>
+                                                        </label>
+                                                        <div class="flex justify-between items-center gap-1">
+                                                            <app-input [error]="splittedItem2.isQuantityError"
+                                                                [errorMessage]="splittedItem2.quantityErrorMessange"
+                                                                [control]="splittedItem2.weightCarats" name="Quantity"
+                                                                type="number" [placeholder]="splittedItem2.quantityUnit"
+                                                                min="0" [max]="item.weightCarats.value!"
+                                                                class="w-full"></app-input>
+                                                            <app-floating-dropdown
+                                                                [floatingDropdownId]=" splittedItem2.quantityDropDownId"
+                                                                class="float-left">
+                                                                <button floating-dropdown-title
+                                                                    (click)="openFloatingDropdown($event, splittedItem2.quantityDropDownId)"
+                                                                    class=" relative text-base rounded-xl w-[6rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                    {{splittedItem2.quantityUnit}} <i
+                                                                        class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                                </button>
+                                                                <div floating-dropdown-menu
+                                                                    class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[6rem] left-0"
+                                                                    style="right: -1.2rem;">
+                                                                    <div *ngFor="let quatityCategoryType of quatityCategorySelectOptions"
+                                                                        (click)="selectQuantityCategoryApproval(quatityCategoryType,  approvalIndex, i, j, k)"
+                                                                        [ngClass]="{'text-gray-300' : quatityCategoryType == splittedItem2.quantityUnit}"
+                                                                        class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                        {{quatityCategoryType}}
+                                                                    </div>
+                                                                </div>
+                                                            </app-floating-dropdown>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    class="3xl:col-span-2 2xl:col-span-4 lg:col-span-6 md:col-span-6 col-span-11">
+                                                    <div>
+                                                        <label class="text-base text-gray-500 block 3xl:hidden">
+                                                            Price&nbsp;<span class="text-danger">*</span>
+                                                        </label>
+                                                        <div class="flex justify-between items-center gap-1">
+                                                            <app-input [control]="splittedItem2.pricePerUnit"
+                                                                name="Price" type="number" placeholder="Price" min="0"
+                                                                class="w-full"></app-input>
+                                                            <app-floating-dropdown
+                                                                [floatingDropdownId]="splittedItem2.pricePerUnitCurrancyDropDownId"
+                                                                class="float-left">
+                                                                <button floating-dropdown-title
+                                                                    (click)="openFloatingDropdown($event, splittedItem2.pricePerUnitCurrancyDropDownId)"
+                                                                    class=" relative text-base rounded-xl w-[5rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                    {{splittedItem2.pricePerUnitCurrancy}}
+                                                                    <i
+                                                                        class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                                </button>
+                                                                <div floating-dropdown-menu
+                                                                    class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[5rem] left-0"
+                                                                    style="right: -1.2rem;">
+                                                                    <div *ngFor="let curracyType of CurracySelectOptions"
+                                                                        (click)="selectPricePerCarateCurrencyApproval(curracyType,  approvalIndex, i, j, k)"
+                                                                        [ngClass]="{'text-gray-300' : curracyType == splittedItem2.pricePerUnitCurrancy}"
+                                                                        class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                        {{curracyType}}
+                                                                    </div>
+                                                                </div>
+                                                            </app-floating-dropdown>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    class="3xl:col-span-2 2xl:col-span-5 lg:col-span-9 sm:col-span-8 xs:col-span-6 col-span-11">
+                                                    <div>
+                                                        <label class="text-base text-gray-500 block 3xl:hidden">
+                                                            Amount
+                                                        </label>
+                                                        <div
+                                                            class="flex justify-between items-center border-[2px] rounded-lg bg-white w-full focus-within:border-gray-400  px-3 py-2 sm:px-4 sm:py-2 text-base">
+                                                            <p
+                                                                [ngClass]="{'text-gray-400' : amount(splittedItem2)=='0.00', 'text-gray-800':amount(splittedItem2)!='0.00'}">
+                                                                {{amount(splittedItem2)=='0.00' ? 'Amount'
+                                                                :amount(splittedItem2) }}</p>
+                                                            <p class=" text-base">AED</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    class="3xl:col-span-1 2xl:col-span-1 lg:col-span-2 sm:col-span-3 xs:col-span-5 col-span-11">
+                                                    <div>
+                                                        <label class="text-base text-gray-500 block 3xl:hidden">
+                                                            Status&nbsp;<span class="text-danger">*</span>
+                                                        </label>
+                                                        <app-floating-dropdown
+                                                            [floatingDropdownId]="splittedItem2.statusDropDownId"
+                                                            class="float-left">
+                                                            <button floating-dropdown-title
+                                                                (click)="openFloatingDropdown($event, splittedItem2.statusDropDownId)"
+                                                                class="floating-dropdown-btn relative text-base rounded-xl w-[8rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                {{splittedItem2.status}} <i
+                                                                    class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                                                            </button>
+                                                            <div floating-dropdown-menu
+                                                                class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[8rem] left-0"
+                                                                style="right: -1.2rem;">
+                                                                <div *ngFor="let status of itemStatusOptions"
+                                                                    (click)="selectStatusApproval(status, approvalIndex, i, j, k)"
+                                                                    [ngClass]="{'text-gray-300' : status == splittedItem2.status}"
+                                                                    class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                    {{status}}
+                                                                </div>
+                                                            </div>
+                                                        </app-floating-dropdown>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    class="col-span-1 flex justify-center xl:items-center xl:row-end-2 row-start-1 row-end-3 col-start-12  px-3 py-2 lg:mx-8 sm:px-4 sm:py-2">
+                                                    <i (click)="removeItemFromApproval(approvalIndex, i, j, k)"
+                                                        class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-full text-gray-900 hover:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- level - 3 -->
+                                        <div *ngIf="splittedItem2.status == ItemStatus.Splitted" class="w-full">
+
+                                            <!-- Add btn -->
+                                            <div *ngFor="let splittedItem3 of splittedItem2.splittedItems; let l = index"
+                                                class="flex flex-col justify-start items-start 3xl:items-center 3xl:mt-0 xl:mb-0 mb-2 mt-6 w-full">
+
+                                                <div
+                                                    class="flex flex-col sm:flex-row 3xl:items-center sm:gap-4 gap-2  w-full relative">
+                                                    <label
+                                                        class="text-base text-white mb-1 sm:ml-20 ml-0 bg-item-level-3 rounded-full flex justify-center items-center  mt-1 3xl:mt-0 h-7 w-7">
+                                                        {{l+1}}
+                                                    </label>
+                                                    <div (click)="addItemToApproval(approvalIndex, i, j, k)"
+                                                        *ngIf="splittedItem2.splittedItems.length == (l+1)"
+                                                        class="absolute flex justify-center items-center rounded-full bg-item-level-3 w-7 h-7 text-white text-2xl cursor-pointer 3xl:right-0 3xl:left-auto 3xl:bottom-3 bottom-5 right-2 sm:left-[5rem] sm:bottom-2">
+                                                        <i class='bx bx-plus text-lg'></i>
+                                                    </div>
+                                                    <div
+                                                        class="grid grid-cols-12 xl:grid-row-1 grid-row-2 gap-x-4 gap-y-1 rounded-xl w-full">
+                                                        <div
+                                                            class="3xl:col-span-1 2xl:col-span-3 sm:col-span-4 col-span-11">
+                                                            <div>
+                                                                <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                    Lot No
+                                                                </label>
+                                                                <app-input [control]="splittedItem3.lotNo" name="Lot No"
+                                                                    type="text" placeholder="Lot No"></app-input>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="3xl:col-span-3 2xl:col-span-4 sm:col-span-7 col-span-11">
+                                                            <div>
+                                                                <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                    Description&nbsp;<span class="text-danger">*</span>
+                                                                </label>
+                                                                <app-input [control]="splittedItem3.description"
+                                                                    name="Description" type="text"
+                                                                    placeholder="Description"></app-input>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="3xl:col-span-2 2xl:col-span-4 lg:col-span-5 md:col-span-5 col-span-11">
+                                                            <div>
+                                                                <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                    Quantity&nbsp;<span class="text-danger">*</span>
+                                                                </label>
+                                                                <div class="flex justify-between items-center gap-1">
+                                                                    <app-input [error]="splittedItem3.isQuantityError"
+                                                                        [errorMessage]="splittedItem3.quantityErrorMessange"
+                                                                        [control]="splittedItem3.weightCarats"
+                                                                        name="Quantity" type="number"
+                                                                        [placeholder]="splittedItem3.quantityUnit"
+                                                                        min="0" [max]="item.weightCarats.value!"
+                                                                        class="w-full"></app-input>
+                                                                    <app-floating-dropdown
+                                                                        [floatingDropdownId]=" splittedItem3.quantityDropDownId"
+                                                                        class="float-left">
+                                                                        <button floating-dropdown-title
+                                                                            (click)="openFloatingDropdown($event, splittedItem3.quantityDropDownId)"
+                                                                            class=" relative text-base rounded-xl w-[6rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                            {{splittedItem3.quantityUnit}} <i
+                                                                                class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                                        </button>
+                                                                        <div floating-dropdown-menu
+                                                                            class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[6rem] left-0"
+                                                                            style="right: -1.2rem;">
+                                                                            <div *ngFor="let quatityCategoryType of quatityCategorySelectOptions"
+                                                                                (click)="selectQuantityCategory(quatityCategoryType, i, j, k, l)"
+                                                                                [ngClass]="{'text-gray-300' : quatityCategoryType == splittedItem3.quantityUnit}"
+                                                                                class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                                {{quatityCategoryType}}
+                                                                            </div>
+                                                                        </div>
+                                                                    </app-floating-dropdown>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="3xl:col-span-2 2xl:col-span-4 lg:col-span-6 md:col-span-6 col-span-11">
+                                                            <div>
+                                                                <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                    Price&nbsp;<span class="text-danger">*</span>
+                                                                </label>
+                                                                <div class="flex justify-between items-center gap-1">
+                                                                    <app-input [control]="splittedItem3.pricePerUnit"
+                                                                        name="Price" type="number" placeholder="Price"
+                                                                        min="0" class="w-full"></app-input>
+                                                                    <app-floating-dropdown
+                                                                        [floatingDropdownId]="splittedItem3.pricePerUnitCurrancyDropDownId"
+                                                                        class="float-left">
+                                                                        <button floating-dropdown-title
+                                                                            (click)="openFloatingDropdown($event, splittedItem3.pricePerUnitCurrancyDropDownId)"
+                                                                            class=" relative text-base rounded-xl w-[5rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                            {{splittedItem3.pricePerUnitCurrancy}}
+                                                                            <i
+                                                                                class="bx bx-chevron-down text-xl  text-gray-500"></i>
+                                                                        </button>
+                                                                        <div floating-dropdown-menu
+                                                                            class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[5rem] left-0"
+                                                                            style="right: -1.2rem;">
+                                                                            <div *ngFor="let curracyType of CurracySelectOptions"
+                                                                                (click)="selectPricePerCarateCurrency(curracyType, i, j, k, l)"
+                                                                                [ngClass]="{'text-gray-300' : curracyType == splittedItem2.pricePerUnitCurrancy}"
+                                                                                class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                                {{curracyType}}
+                                                                            </div>
+                                                                        </div>
+                                                                    </app-floating-dropdown>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="3xl:col-span-2 2xl:col-span-5 lg:col-span-9 sm:col-span-8 xs:col-span-6 col-span-11">
+                                                            <div>
+                                                                <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                    Amount
+                                                                </label>
+                                                                <div
+                                                                    class="flex justify-between items-center border-[2px] rounded-lg bg-white w-full focus-within:border-gray-400  px-3 py-2 sm:px-4 sm:py-2 text-base">
+                                                                    <p
+                                                                        [ngClass]="{'text-gray-400' : amount(splittedItem3)=='0.00', 'text-gray-800':amount(splittedItem3)!='0.00'}">
+                                                                        {{amount(splittedItem3)=='0.00' ? 'Amount'
+                                                                        :amount(splittedItem3) }}</p>
+                                                                    <p class=" text-base">AED</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="3xl:col-span-1 2xl:col-span-1 lg:col-span-2 sm:col-span-3 xs:col-span-5 col-span-11">
+                                                            <div>
+                                                                <label class="text-base text-gray-500 block 3xl:hidden">
+                                                                    Status&nbsp;<span class="text-danger">*</span>
+                                                                </label>
+                                                                <app-floating-dropdown
+                                                                    [floatingDropdownId]="splittedItem3.statusDropDownId"
+                                                                    class="float-left">
+                                                                    <button floating-dropdown-title
+                                                                        (click)="openFloatingDropdown($event, splittedItem3.statusDropDownId)"
+                                                                        class="floating-dropdown-btn relative text-base rounded-xl w-[8rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+                                                                        {{splittedItem3.status}} <i
+                                                                            class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                                                                    </button>
+                                                                    <div floating-dropdown-menu
+                                                                        class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 w-[8rem] left-0"
+                                                                        style="right: -1.2rem;">
+                                                                        <div *ngFor="let status of itemStatusOptions"
+                                                                            (click)="selectStatusApproval(status,approvalIndex, i, j, k, l)"
+                                                                            [ngClass]="{'text-gray-300' : status == splittedItem3.status, 'hidden': status == ItemStatus.Splitted}"
+                                                                            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+                                                                            {{status}}
+                                                                        </div>
+                                                                    </div>
+                                                                </app-floating-dropdown>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="col-span-1 flex justify-center xl:items-center xl:row-end-2 row-start-1 row-end-3 col-start-12  px-3 py-2 lg:mx-8 sm:px-4 sm:py-2">
+                                                            <i (click)="removeItemFromApproval(approvalIndex, i, j, k, l)"
+                                                                class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-full text-gray-900 hover:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div
+                class="flex  justify-center sm:justify-between items-start w-full sm:pr-16 pr-0 mt-6 flex-wrap md:flex-row flex-col gap-10 md:gap-4">
+                <!-- Import Approvals -->
+                <div class="flex justify-start items-start flex-col ">
+                    <div *ngIf="selectedCustomer" class="flex flex-col items-start sm:w-1/2 w-full mb-6">
+                        <label class="text-base text-gray-500">
+                            Import Approval
+                        </label>
+
+                        <!-- Approvals Dropdown -->
+                        <div class="flex justify-between items-center gap-4 flex-col xs:flex-row">
+                            <app-floating-dropdown [floatingDropdownId]="approvalFloatingDropdownId" class="float-left">
+                                <button floating-dropdown-title
+                                    (click)="openFloatingDropdown($event, approvalFloatingDropdownId)"
+                                    class="floating-dropdown-btn relative text-base rounded-xl xl:w-[30vw] lg:w-[30vw] md:w-[24vw] sm:w-[52vw] xs:w-[60vw] 2xs:w-[74vw] w-[67vw] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black font-semibold">
+                                    {{selectedApproval != null ? 'Approval No #' + selectedApproval.approvalNo
+                                    :'--SelectApproval--'}} <i
+                                        class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+                                </button>
+                                <div floating-dropdown-menu
+                                    class="floating-dropdown-btn absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-xl p-2 mr-5 xl:w-[30vw] lg:w-[30vw] md:w-[24vw] sm:w-[52vw] xs:w-[60vw] 2xs:w-[74vw] w-[67vw]  left-0 divide-y-2 divide-gray-100"
+                                    style="right: -1.2rem;">
+
+                                    <!-- Search -->
+                                    <div class=" floating-dropdown-btn flex items-center w-full group mb-2">
+                                        <div
+                                            class="floating-dropdown-btn  flex-none absolute  flex items-center justify-center ps-3 pointer-events-none">
+                                            <i
+                                                class="floating-dropdown-btn bx bx-search text-xl text-gray-500 group-hover:text-themeblue-400"></i>
+                                        </div>
+                                        <input type="search"
+                                            class="floating-dropdown-btn form-input pl-10 rounded-lg border-transparent focus:border-transparent bg-themeblue-50 text-themeblue-900"
+                                            placeholder="Search..." [(ngModel)]="approvalFilterText"
+                                            (input)="filterApprovalData($event)">
+                                    </div>
+
+                                    <!-- approval List -->
+                                    <div class=" max-h-[12rem] overflow-auto divide-y-2 divide-gray-100">
+                                        <div *ngFor="let approvalItrable of approvalSelectOptions"
+                                            (click)="selectApproval(approvalItrable)">
+                                            <div [ngClass]="{'text-gray-300' : approvalItrable == selectedApproval}"
+                                                class="cursor-pointer flex flex-col lg:flex-row justify-between items-start py-3 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap  w-full">
+                                                <p class="font-semibold text-gray-800">Approval
+                                                    No&nbsp;&nbsp;#{{approvalItrable.approvalNo}}</p>
+                                                <p>Total&nbsp;:&nbsp;<span
+                                                        class="font-semibold text-gray-800">{{approvalItrable.totalAmountIncludingVat}}</span>
+                                                    &nbsp;&nbsp;
+                                                    <span class="text-gray-800">AED</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </app-floating-dropdown>
+
+                            <button [disabled]="isImporting || selectedApproval == null" type="submit"
+                                (click)="importApproval()" [ngClass]="{'opacity-50': selectedApproval == null}"
+                                class="py-1.5 sm:py-1.5 rounded-lg  px-6 flex-none text-base bg-themeblue-800 text-white duration-200 h-10 sm:w-28 xs:w-fit w-full">
+                                <app-dot-wave-loader colorCode="#FFFFFF"
+                                    class="flex justify-center items-center my-1.5 mt-1.5 "
+                                    *ngIf="isImporting ; else importText" />
+                                <ng-template #importText>
+                                    <div class="flex justify-center items-center gap-2 ">
+                                        <i class="ph ph-download-simple text-xl"></i>
+                                        <p class="text-white text-base sm:block xs:hidden block">Import</p>
+                                    </div>
+                                </ng-template>
+
+
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- payment -->
+                    <div>
+                        <input [formControl]="isPaid" type="checkbox"
+                            class="form-checkbox rounded h-3 w-3 sm:h-4 sm:w-4 text-themeblue-900  ml-2"><span
+                            class="ml-2 text-base text-gray-800 font-semibold">Mark as Paid</span>
+
+                        <div *ngIf="isPaid.value">
+                            <label class="text-base text-gray-500 mt-4">
+                                Payment Date&nbsp;<span class="text-danger">*</span>
+                            </label>
+                            <app-input [control]="PaymentDateControl" type="date"
+                                class="block xl:w-[30vw] lg:w-[30vw] md:w-[24vw] sm:w-[52vw] xs:w-[60vw] 2xs:w-[74vw] w-[67vw]"></app-input>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total -->
+                <div class="grid grid-cols-2 items-center justify-between gap-2 sm:gap-x-12 sm:w-fit w-full">
+                    <div class="flex sm:justify-end justify-between items-center">
+                        <p class="text-base font-bold">Subtotal</p>
+                    </div>
+                    <div class="flex justify-end items-center">
+                        <p class="xs:text-xl text-lg font-bold text-gray-800">{{getSubTotalString()}}&nbsp;<span
+                                class="text-base">AED</span></p>
+                    </div>
+                    <div class="flex sm:justify-end justify-between items-center">
+                        <p class="text-base font-bold">VAT</p>
+                    </div>
+                    <div class="flex justify-end items-center ">
+                        <p class="text-lg font-bold">{{getVatString()}}&nbsp;<span class="text-base">AED</span></p>
+                    </div>
+                    <div class="flex sm:justify-end justify-between items-center ">
+                        <p class="text-lg font-bold">Total</p>
+                    </div>
+                    <div class="flex justify-end items-center">
+                        <p class="xs:text-xl text-lg font-bold text-gray-900">{{getTotalString()}}&nbsp;<span
+                                class="text-base">AED</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Actions -->
+    <div class="flex xs:justify-end justify-between items-center gap-4 mt-5 w-full">
+
+        <button *ngIf="isUpdate" [disabled]="isDeleting" type="submit" (click)="deleteInvoice(invoice!)"
+            class="py-1.5 sm:py-1.5 rounded-lg  px-6 flex-none text-base bg-red-100 text-danger hover:bg-danger hover:text-white duration-200">
+            <app-dot-wave-loader colorCode="#FF0000" class="flex justify-center items-center my-1.5 mt-1.5 "
+                *ngIf="isDeleting ; else deleteText" />
+            <ng-template #deleteText> Delete </ng-template>
+        </button>
+
+        <button [disabled]="isSaving" type="submit" (click)="save()"
+            class="text-white py-1.5 sm:py-1.5 rounded-lg px-6 flex-none text-base bg-themeblue-800">
+            <app-dot-wave-loader colorCode="#FFFFFF" class="flex justify-center items-center my-1.5 mt-1.5 "
+                *ngIf="isSaving ; else saveText" />
+            <ng-template #saveText> Save </ng-template>
+        </button>
+
+        <button [disabled]="isPreviewing" type="submit" (click)="saveAndPreview()"
+            class="text-white py-1.5 sm:py-1.5 rounded-lg bg-themeblue-800 px-6 flex-none text-base ">
+            <app-dot-wave-loader colorCode="#FFFFFF" class="flex justify-center items-center my-1.5 t-1.5 "
+                *ngIf="isPreviewing ; else saveandPreviewText" />
+            <ng-template #saveandPreviewText> Save & View </ng-template>
+        </button>
+    </div>
+
+</main>

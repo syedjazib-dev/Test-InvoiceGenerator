@@ -1,0 +1,186 @@
+<app-msg [MsgBoxId]="msgBoxId"></app-msg>
+
+<!-- Filtter Modal -->
+<app-floating-modal [floatingModalId]="approvalFilterModalId" title="Filter">
+  <div class="xs:w-80 w-full flex flex-col gap-4">
+    <div>
+      <label class="text-gray-500 text-base font-semibold">Create date</label>
+      <input type="date" [(ngModel)]="createDateFilterInput"
+        class="w-full px-3 py-2 sm:px-4 sm:py-2 border-[2px] rounded-lg border-gray-200 text-black bg-white"
+        placeholder="Create Date" id="createDateFilter" />
+    </div>
+
+    <!-- status dropdown -->
+    <div class="flex flex-col justify-start">
+      <label class="text-gray-500 text-base font-semibold">Status</label>
+      <app-floating-dropdown [floatingDropdownId]="approvalFilterdropDownId" class="float-left">
+        <button floating-dropdown-title (click)="openFloatingDropdown($event, approvalFilterdropDownId)"
+          class="floating-dropdown-btn relative text-base rounded-lg xs:w-[20rem] 2xs:w-[16rem] w-[12.7rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+          {{approvalStatusFilterInput}} <i class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+        </button>
+        <div floating-dropdown-menu
+          class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-lg p-2 mr-5 w-fit xs:min-w-[20rem] 2xs:min-w-[16rem] min-w-[12.7rem] left-0"
+          style="right: -1.2rem;">
+          <div *ngFor="let status of approvalStatusOptions" (click)="selectInvoiceStatusFilter(status)"
+            [ngClass]="{'text-gray-300' : status == approvalStatusFilter}"
+            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+            {{status}}
+          </div>
+        </div>
+      </app-floating-dropdown>
+    </div>
+
+    <div class="flex justify-center items-cente gap-3">
+      <button (click)="resetFilters()" class="py-2 sm:py-2 rounded text-danger w-full mt-2 text-base bg-red-100">
+        Reset
+      </button>
+      <button (click)="appyFilter()"
+        class="text-white py-2 sm:py-2 rounded bg-gradient-to-r from-themeblue-800 to-themeblue-900 w-full mt-2 text-base">
+        Apply
+      </button>
+    </div>
+  </div>
+</app-floating-modal>
+
+<main class="sm:mx-14 mx-8 my-8">
+
+  <div class="flex w-full justify-between items-center gap-4 sm:flex-nowrap flex-wrap">
+
+    <div class="flex justify-center items-center gap-4 w-full sm:w-fit">
+      <!-- Search -->
+      <div class="flex items-center relative w-full sm:w-fit group">
+        <div class=" flex-none absolute  flex items-center justify-center ps-3 pointer-events-none">
+          <i class="bx bx-search text-xl text-themeblue-900 "></i>
+        </div>
+        <input type="search"
+          class="form-input pl-10 rounded-lg border-transparent focus:border-transparent bg-themeblue-200 text-themeblue-900"
+          placeholder="Search..." [(ngModel)]="filterText" (input)="filterData($event)">
+      </div>
+    </div>
+
+    <div class="flex sm:justify-center sm:w-fit w-full justify-between items-center gap-2 ">
+      <!-- Export Button -->
+      <div (click)="exportexcel()"
+        class="cursor-pointer flex-none gap-2.5 flex justify-center items-center h-10 2xs:px-5 px-2.5 rounded-lg bg-themeblue-200 text-themeblue-900 hover:text-themeblue-800">
+        <i class='ph ph-microsoft-excel-logo text-xl'></i>
+        <p class="font-semibold text-base 2xs:block hidden">Export</p>
+      </div>
+
+      <div class="flex justify-center items-center gap-2">
+        <!-- Filter Button -->
+        <div (click)="openFilterModal()"
+          class="cursor-pointer flex-none flex items-center gap-2.5 justify-center h-10 2xs:px-5 px-2.5 rounded-lg bg-themeblue-200 text-themeblue-900 hover:text-themeblue-800">
+          <i class='bx bx-filter-alt text-xl'></i>
+          <p class=" font-semibold text-base 2xs:block hidden">Filter</p>
+        </div>
+
+        <!-- Add Button -->
+        <button routerLink="/approvals/a"
+          class="flex-none items-center gap-2.5 waves-effect flex justify-center h-10 w-10 rounded-lg bg-themeblue-200 text-themeblue-900 hover:text-themeblue-800">
+          <i class="bx bx-plus text-2xl  "></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Table -->
+  <div class="border-[0px] border-themeblue-900 w-full rounded-lg mt-5 shadow-[0_0px_12px_1px_rgba(0,0,0,0.1)]">
+    <div class="bg-white sticky top-0 rounded-t-lg border-b-[1px] border-themeblue-900">
+      <p class="text-left py-3 px-5 text-themeblue-900 text-2xl font-bold">APPROVALS</p>
+    </div>
+
+    <div class="overflow-auto w-full h-max max-h-[50vh]">
+
+      <table class="min-w-full whitespace-nowrap text-base  ">
+
+        <thead class="sticky top-[0px] bg-white" id="table-data">
+
+          <tr class="bg-themeblue-200 text-themeblue-900 shadow-[#111b7d_0px_1px_0px_0px]">
+            <th class="text-left py-1.5 px-5 pl-5 w-fit">
+              Approval No
+            </th>
+            <th class="text-left py-1.5 px-5 pl-5 w-fit">
+              Status
+            </th>
+            <th class="text-left py-1.5 px-5">
+              <div class="flex justify-start items-cente gap-2">
+                <p>Create Date</p>
+                <p *ngIf="createDateFilter != null" class="text-danger">*</p>
+              </div>
+            </th>
+            <th class="text-left py-1.5 px-5">
+              Customer Name
+            </th>
+            <th class="text-left py-1.5 px-5">
+              <p>Vat&nbsp;&nbsp;{{Vat.vatPr}}%</p>
+            </th>
+            <th class="text-left py-1.5 px-5">
+              <p>Total Amount</p>
+            </th>
+            <th class="text-left py-1.5 px-5">Generated/Updated by</th>
+            <th class="text-left py-1.5 px-5"></th>
+          </tr>
+        </thead>
+        <tbody *ngFor="let entity of entityList; let i = index" class="divide-y divide-gray-200">
+          <tr class="hover:bg-themeblue-100" (click)="openLink($event, 'approvals/view', entity.id!.toString())">
+            <td class="py-3 px-5 pl-5 text-gray-800 font-semibold">
+              <p>#{{entity.approvalNo}}</p>
+            </td>
+            <td class="py-3 px-5 pl-5 text-gray-800 font-semibold">
+              <app-status-tag 
+              [status]="entity.status"
+              [color]="entity.status == ApprovalStatus.Billed ? 'success'
+                      : entity.status == ApprovalStatus.Pending ? 'danger' 
+                      : entity.status == ApprovalStatus.Returned ? 'secondary' : 'danger'"/>
+            </td>
+            <td class="py-3 px-5">
+              <p>{{entity.createDate | date }}</p>
+            </td>
+            <td class="py-3 px-5">
+              <div class="flex justify-start items-center gap-3">
+                <p class="text-black font-semibold">{{entity.customer!.name}}</p>
+              </div>
+            </td>
+            <td class="py-3 px-5">
+              <p class="font-semibold">{{entity.vat}}&nbsp;&nbsp;<span
+                  class="text-sm text-gray-500 font-normal">AED</span></p>
+            </td>
+            <td class="py-3 px-5">
+              <p class="text-gray-800 font-semibold">{{entity.totalAmountIncludingVat}}&nbsp;&nbsp;<span
+                  class="text-sm text-gray-500 font-normal">AED</span></p>
+            </td>
+            <td class="py-3 px-5">
+              <p>{{entity.salesman!.name}}</p>
+            </td>
+
+            <td class="py-3 px-5">
+              <div class="flex justify-end items-center gap-4">
+                <div class="flex justify-center items-center gap-4">
+                  <button (click)="openLink($event, 'approvals/a', entity.id!.toString())" [disabled]="entity.status == ApprovalStatus.Billed"
+                    class="flex justify-center items-center gap-5 text-xl nav-link p-2.5 rounded-full  disabled:opacity-30 ">
+                    <i class='bx bx-edit text-themeblue-400 cursor-pointer'></i>
+                  </button>
+                  <button *ngIf="user.role == UserRole.admin" (click)="deleteApproval($event, entity)" [disabled]="entity.status == ApprovalStatus.Billed"
+                    class="flex justify-center items-center gap-5 text-xl  p-2.5 rounded-full hover:bg-red-100 disabled:opacity-30">
+                    <i class='ph ph-trash text-danger cursor-pointer'></i>
+                  </button>
+                </div>
+              </div>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Paggination -->
+  <app-pagination-bar 
+  [recordPerPageOptions]="recordPerPageOptions"
+  [recordPerPage]="recordPerPage"
+  [pageNo]="pageNo"
+  [totalPageCount]="totalPageCount"
+  [disableFlag]="isGettingUser"
+  ></app-pagination-bar>
+</main>

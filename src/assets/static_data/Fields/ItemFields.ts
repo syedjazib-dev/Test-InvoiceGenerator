@@ -1,0 +1,16 @@
+export class ItemFields {
+    static readonly id = 'Id'
+    static readonly invoiceId = 'InvoiceId'
+    static readonly approvalId = 'ApprovalId'
+    static readonly description = 'Description'
+    static readonly lotNo = 'LotNo'
+    static readonly weightCarats = 'WeightCarats'
+    static readonly quantityUnit = 'QuantityUnit'
+    static readonly pricePerUnit = 'PricePerUnit'
+    static readonly pricePerUnitCurrancy = 'PricePerUnitCurrancy'
+    static readonly amount = 'Amount'
+    static readonly vat = 'Vat'
+    static readonly amountIncludingVat = 'AmountIncludingVat'
+    static readonly createDate = 'CreateDate'
+    static readonly updateDate = 'UpdateDate'
+}

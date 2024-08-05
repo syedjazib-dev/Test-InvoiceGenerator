@@ -1,0 +1,97 @@
+<app-msg [MsgBoxId]="msgBoxId"></app-msg>
+
+<div id="close" *ngIf="showMenu" [ngClass]="{'close-menu-animation': isMenuCloseing}" style="z-index: 52;"
+    class=" fc-offcanvas-open:translate-x-0 translate-x-full rtl:-translate-x-full fixed top-0 end-0 transition-all duration-300 transform h-full sm:max-w-full w-full z-50 bg-gradient-to-b from-themeblue-900 via-themeblue-800 to-themeblue-900  fc-offcanvas open menu-animation shadow-lg text-white">
+    <div class="flex justify-between items-center py-7 px-10">
+        <a routerLink="/approvals">
+            <img class="w-16" src="assets/images/logo.png" alt="">
+        </a>
+        <i (click)="closeMenu()"
+            class="bx bx-x text-3xl  inline-flex flex-shrink-0 justify-center items-center h-10 w-10 rounded-lg text-white  focus:outline-none focus:ring-offset-2 focus:ring-offset-white hover:bg-themeblue-800"></i>
+    </div>
+    <div class="flex flex-col justify-center items-center gap-8 mt-5  text-lg">
+        <a *ngIf="user.role == UserRole.admin" routerLink="/users" (click)="closeMenu()" routerLinkActive="max-w-full " class="group transition duration-300 ">Users
+            <span routerLinkActive="max-w-full bg-themeblue-800"
+                class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1.5px] bg-white text-center"></span>
+        </a>
+        <a routerLink="/customers" (click)="closeMenu()" routerLinkActive="max-w-full " class="group transition duration-300 ">Customers
+            <span routerLinkActive="max-w-full bg-themeblue-800"
+                class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1.5px] bg-white text-center"></span>
+        </a>
+        <a routerLink="/approvals" (click)="closeMenu()" routerLinkActive="max-w-full" class="group transition duration-300 ">Approvals
+            <span routerLinkActive="max-w-full bg-themeblue-800"
+                class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1.5px] bg-white text-center"></span>
+        </a>
+        <a routerLink="/invoices" (click)="closeMenu()" routerLinkActive="max-w-full " class="group transition duration-300 ">Invoices
+            <span routerLinkActive="max-w-full bg-themeblue-800"
+                class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1.5px] bg-white text-center"></span>
+        </a>
+    </div>
+</div>
+
+
+<nav
+    class="flex justify-between items-center bg-gradient-to-r from-themeblue-900 via-themeblue-800 to-themeblue-900  sm:px-10 2xs:px-5 px-3  md:py-3 py-1.5 mt-5  sm:mx-14 mx-8 rounded-lg text-white text-lg shadow-[0_0px_12px_2px_rgba(0,0,0,0.2)]">
+    <a routerLink="" class="hidden md:block">
+        <img class="w-14" src="assets/images/logo.png" alt="">
+    </a>
+    <div class="flex justify-center items-center gap-8 hidden md:flex">
+        <a *ngIf="user.role == UserRole.admin" routerLink="/users" routerLinkActive="max-w-full " class="group transition duration-300 ">Users
+            <span routerLinkActive="max-w-full bg-themeblue-800"
+                class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1.5px] bg-white text-center"></span>
+        </a>
+        <a routerLink="/customers" routerLinkActive="max-w-full " class="group transition duration-300 ">Customers
+            <span routerLinkActive="max-w-full bg-themeblue-800"
+                class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1.5px] bg-white text-center"></span>
+        </a>
+        <a routerLink="/approvals" routerLinkActive="max-w-full" class="group transition duration-300 ">Approvals
+            <span routerLinkActive="max-w-full bg-themeblue-800"
+                class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1.5px] bg-white text-center"></span>
+        </a>
+        <a routerLink="/invoices" routerLinkActive="max-w-full " class="group transition duration-300 ">Invoices
+            <span routerLinkActive="max-w-full bg-themeblue-800"
+                class="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1.5px] bg-white text-center"></span>
+        </a>
+    </div>
+
+    <!-- side menu toggle button -->
+    <div class="items-center justify-center h-10 w-10 hover:bg-themeblue-800 md:hidden flex rounded-full">
+        <i (click)="openMenu()" id="menu-toggle" class="ph ph-list text-2xl"></i>
+    </div>
+
+
+    <div class="md:flex group cursor-pointer h-fit">
+        <app-floating-dropdown [floatingDropdownId]="ProfileDropdownId" class="float-right">
+            <button floating-dropdown-title (click)="openFloatingDropdown($event, ProfileDropdownId)"
+                class="floating-dropdown-btn flex items-center gap-2.5  p-2 px-3 rounded-full hover:bg-themeblue-800">
+                <div
+                    class="floating-dropdown-btn rounded-full h-8 w-8 flex justify-center items-center  bg-gradient-to-r from-golden-900 via-golden-300 to-golden-900  duration-500">
+                    <p class="floating-dropdown-btn text-black text-xl font-semibold">
+                        {{this.user.name![0].toUpperCase()}}</p>
+                </div>
+                <span class="floating-dropdown-btn 2xs:flex items-center hidden">
+                    <span class="floating-dropdown-btn font-medium text-base">{{this.user.name}}</span>
+                    <i class='floating-dropdown-btn ph ph-chevron-down'></i>
+                </span>
+            </button>
+
+            <div floating-dropdown-menu
+                class="absolute w-36 top-15 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white shadow-lg rounded-lg p-2 mr-5"
+                style="right: -1.2rem;">
+                <p class="tetx-gray-800 font-semibold hover:bg-themeblue-200 2xs:hidden block ">{{user.name}}</p>
+                <a (click)="logout($event)"
+                    class="flex items-center py-2 px-3 rounded-md text-sm text-gray-800  hover:bg-themeblue-200">
+                    Log Out
+                </a>
+            </div>
+        </app-floating-dropdown>
+            
+    </div>
+
+    <!-- <div class="inline-flex">
+        <a routerLink="/login" class="before:absolute before:content-[''] before:w-full before:h-0 before:top-[50%] before:left-[50%] before:bg-[white] before:transform before:translate-x-[-50%] before:translate-y-[-50%] before:rotate-[-45deg] before:z-[-1] before:duration-500 before:ease-out hover:before:h-[380%]  overflow-hidden relative inline-block rounded-full px-10 py-2 bg-gradient-to-r from-themeblue-800 to-themeblue-900 duration-500 ease-out z-[1] border-[2px] border-transparent hover:border-themeblue-800 text-white hover:text-black">Login</a>
+    </div> -->
+</nav>
+
+
+<router-outlet></router-outlet>

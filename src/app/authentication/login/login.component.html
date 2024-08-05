@@ -1,0 +1,34 @@
+<div class="flex justify-center items-center h-[100vh] bg-themeblue-200">
+    <div style="box-shadow: 0 0px 15px 2px rgb(0 0 0 / 0.1)"
+        class="bg-white p-10 rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm mx-4 relative transition-all duration-500">
+        <div class="flex flex-col items-center mb-4">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-themeblue-950 flex items-center justify-center mb-3 flex justify-center items-center">
+                <i class="ph-user text-3xl " style="color: #ffffff;"></i>
+            </div>
+            <h2 class="text-lg sm:text-xl font-semibold login-text-color">LogIn</h2>
+        </div>
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+        <div class="mb-4">
+            <app-input name="Email" [control]="email" type="text" placeholder="Email" autocomplete="email" postfixIcon="ph ph-envelope-simple" />
+        </div>
+        <div class="mb-4">
+            <app-input name="Password" [control]="password" type="password" placeholder="Password" postfixIcon="ph ph-key" 
+                autocomplete="Password" />
+        </div>
+        <div class="flex justify-between items-center mb-4">
+            <label class="flex items-center text-sm">
+                <input [formControl]="rememberMe" type="checkbox"
+                    class="form-checkbox rounded h-3 w-3 sm:h-4 sm:w-4 text-themeblue-950"><span
+                    class="ml-2">Remember Me</span>
+            </label>
+            <!-- <a routerLink="/forgotpassword" class="text-sm hover:underline login-text-color">Forgot Password?</a> -->
+        </div>
+        <button [disabled]="isLogingIn" type="submit"
+            class="w-4/5 text-white py-2 sm:py-3 rounded transition-colors bg-themeblue-950 text-white absolute bottom-[-6%] left-[50%] transform translate-x-[-50%]">
+            <app-dot-wave-loader colorCode="#FFFFFF" class="flex justify-center items-center my-1 mt-1.5"
+                *ngIf="isLogingIn ; else GetStartText" />
+            <ng-template #GetStartText> Get Started </ng-template>
+        </button>
+    </form>
+    </div>
+</div>

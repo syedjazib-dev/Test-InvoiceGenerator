@@ -1,0 +1,287 @@
+<app-msg [MsgBoxId]="msgBoxId"></app-msg>
+
+<!-- Filtter Modal -->
+<app-floating-modal [floatingModalId]="userFilterModalId" title="Filter">
+  <div class="xs:w-80 w-full flex flex-col gap-4">
+    <div>
+      <label class="text-gray-500 text-base font-semibold">Create date</label>
+      <input type="date" [(ngModel)]="createDateFilterInput"
+        class="w-full px-3 py-2 sm:px-4 sm:py-2 border-[2px] rounded-lg border-gray-200 text-black bg-white"
+        placeholder="Create Date" id="createDateFilter" />
+    </div>
+    <!-- Role dropdown -->
+    <div class="flex flex-col justify-start">
+      <label class="text-gray-500 text-base font-semibold">Role</label>
+      <app-floating-dropdown [floatingDropdownId]="roleDropdownId" class="float-left">
+        <button floating-dropdown-title (click)="openFloatingDropdown($event, roleDropdownId)"
+          class="floating-dropdown-btn relative text-base rounded-lg xs:w-[20rem] 2xs:w-[16rem] w-[12.7rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+          {{roleFilterInput}} <i class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+        </button>
+        <div floating-dropdown-menu
+          class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-lg p-2 mr-5 w-fit xs:min-w-[20rem] 2xs:min-w-[16rem] min-w-[12.7rem] left-0"
+          style="right: -1.2rem;">
+          <div *ngFor="let role of filterRoleOprions" (click)="selectRoleFilter(role)"
+            [ngClass]="{'text-gray-300' : role == selectedRole}"
+            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+            {{role}}
+          </div>
+        </div>
+      </app-floating-dropdown>
+    </div>
+
+
+    <!-- Active dropdown -->
+    <div class="flex flex-col justify-start">
+      <label class="text-gray-500 text-base font-semibold">State</label>
+      <app-floating-dropdown [floatingDropdownId]="activeDropdownId" class="float-left">
+        <button floating-dropdown-title (click)="openFloatingDropdown($event, activeDropdownId)"
+          class="floating-dropdown-btn relative text-base rounded-lg xs:w-[20rem] 2xs:w-[16rem] w-[12.7rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+          {{activeFilterInput}} <i class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+        </button>
+        <div floating-dropdown-menu
+          class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-lg p-2 mr-5 w-fit xs:min-w-[20rem] 2xs:min-w-[16rem] min-w-[12.7rem] left-0"
+          style="right: -1.2rem;">
+          <div *ngFor="let state of filterActiveOptions" (click)="selectActiveFilter(state)"
+            [ngClass]="{'text-gray-300' : state == activeFilterInput}"
+            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+            {{state}}
+          </div>
+        </div>
+      </app-floating-dropdown>
+    </div>
+
+    <div class="flex justify-center items-cente gap-3">
+      <button (click)="resetFilters()" class="py-2 sm:py-2 rounded text-danger w-full mt-2 text-base bg-red-100">
+        Reset
+      </button>
+      <button (click)="appyFilter()"
+        class="text-white py-2 sm:py-2 rounded bg-gradient-to-r from-themeblue-800 to-themeblue-900 w-full mt-2 text-base">
+        Apply
+      </button>
+    </div>
+  </div>
+</app-floating-modal>
+
+<!-- Upadte User Modal -->
+<app-floating-modal [floatingModalId]="updateUserModelId" title="Update User">
+  <form [formGroup]="userUpdateForm" (ngSubmit)="updateUser()" class="xs:w-80 w-full flex flex-col gap-4">
+    <app-input label="Name" [control]="name" name="Name" type="text" autocomplete="Name" placeholder="Name" [isRequired]="true"></app-input>
+    <app-input label="Email" [control]="email" name="Email" type="text" placeholder="Email"></app-input>
+
+    <!-- Role dropdown -->
+    <div class="flex flex-col justify-start">
+      <label class="text-gray-500 text-base font-semibold">Role&nbsp;<span class="text-danger">*</span></label>
+      <app-floating-dropdown [floatingDropdownId]="roleDropdownId" class="float-left">
+        <button floating-dropdown-title (click)="openFloatingDropdown($event, roleDropdownId)"
+          class="floating-dropdown-btn relative text-base rounded-lg xs:w-[20rem] 2xs:w-[16rem] w-[12.7rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+          {{selectedRole}} <i class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+        </button>
+        <div floating-dropdown-menu
+          class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-lg p-2 mr-5 w-fit xs:min-w-[20rem] 2xs:min-w-[16rem] min-w-[12.7rem] left-0"
+          style="right: -1.2rem;">
+          <div *ngFor="let role of roleOptions" (click)="selectRole(role)"
+            [ngClass]="{'text-gray-300' : role == selectedRole}"
+            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+            {{role}}
+          </div>
+        </div>
+      </app-floating-dropdown>
+    </div>
+
+    <button [disabled]="isUpdatingUser" type="submit"
+      class="text-white py-2 sm:py-3 rounded bg-gradient-to-r from-themeblue-800 to-themeblue-900 w-full mt-2 text-base">
+      <app-dot-wave-loader colorCode="#FFFFFF" class="flex justify-center items-center my-1 mt-1.5"
+        *ngIf="isUpdatingUser ; else updateUsertext" />
+      <ng-template #updateUsertext> Update User </ng-template>
+    </button>
+  </form>
+</app-floating-modal>
+
+<!-- Add User Modal -->
+<app-floating-modal [floatingModalId]="addUserModalId" title="Add User">
+  <form [formGroup]="userForm" (ngSubmit)="createUser()" class="xs:w-80 w-full flex flex-col gap-4">
+    <app-input label="Name" [control]="name" name="Name" type="text" autocomplete="Name" placeholder="Name" [isRequired]="true"></app-input>
+    <app-input label="Email" [control]="email" name="Email" type="text" placeholder="Email" [isRequired]="true"></app-input>
+    <app-input label="Password" [control]="password" name="Password" type="text" placeholder="Password" [isRequired]="true"></app-input>
+
+    <!-- Role dropdown -->
+    <div class="flex flex-col justify-start">
+      <label class="text-gray-500 text-base font-semibold">Role&nbsp;<span class="text-danger">*</span></label>
+      <app-floating-dropdown [floatingDropdownId]="roleDropdownId" class="float-left">
+        <button floating-dropdown-title (click)="openFloatingDropdown($event, roleDropdownId)"
+          class="floating-dropdown-btn relative text-base rounded-lg xs:w-[20rem] 2xs:w-[16rem] w-[12.7rem] px-3 py-2 sm:px-4 sm:py-1.5 border-[2px] flex justify-between items-center border-grey-200 bg-white text-black">
+          {{selectedRole}} <i class="bx bx-chevron-down text-xl floating-dropdown-btn text-gray-500"></i>
+        </button>
+        <div floating-dropdown-menu
+          class="absolute top-10 z-50 transition-[margin,opacity] duration-900 mt-2 bg-white border-2 border-grey-400 rounded-lg p-2 mr-5 w-fit xs:min-w-[20rem] 2xs:min-w-[16rem] min-w-[12.7rem] left-0"
+          style="right: -1.2rem;">
+          <div *ngFor="let role of roleOptions" (click)="selectRole(role)"
+            [ngClass]="{'text-gray-300' : role == selectedRole}"
+            class="cursor-pointer flex items-center py-2 px-3 rounded-md text-sm text-gray-500 hover:bg-themeblue-200 whitespace-nowrap">
+            {{role}}
+          </div>
+        </div>
+      </app-floating-dropdown>
+    </div>
+
+    <button [disabled]="isCreatingUser" type="submit"
+      class="text-white py-2 sm:py-3 rounded bg-gradient-to-r from-themeblue-800 to-themeblue-900 w-full mt-2 text-base">
+      <app-dot-wave-loader colorCode="#FFFFFF" class="flex justify-center items-center my-1 mt-1.5"
+        *ngIf="isCreatingUser ; else createUsertext" />
+      <ng-template #createUsertext> Create User </ng-template>
+    </button>
+  </form>
+</app-floating-modal>
+
+<main class="sm:mx-14 mx-8 my-8">
+
+  <div class="flex w-full justify-between items-center gap-4 sm:flex-nowrap flex-wrap">
+
+    <div class="flex justify-center items-center gap-4 w-full sm:w-fit">
+      <!-- Search -->
+      <div class="flex items-center relative w-full sm:w-fit group">
+        <div class=" flex-none absolute  flex items-center justify-center ps-3 pointer-events-none">
+          <i class="bx bx-search text-xl text-themeblue-900 "></i>
+        </div>
+        <input type="search"
+          class="form-input pl-10 rounded-lg border-transparent focus:border-transparent bg-themeblue-200 text-themeblue-900"
+          placeholder="Search..." [(ngModel)]="filterText" (input)="filterData($event)">
+      </div>
+    </div>
+
+    <div class="flex sm:justify-center sm:w-fit w-full justify-between items-center gap-2 ">
+      <!-- Export Button -->
+      <div (click)="exportexcel()"
+        class="cursor-pointer flex-none gap-2.5 flex justify-center items-center h-10 2xs:px-5 px-2.5 rounded-lg bg-themeblue-200 text-themeblue-900 hover:text-themeblue-800">
+        <i class='ph ph-microsoft-excel-logo text-xl'></i>
+        <p class="font-semibold text-base 2xs:block hidden">Export</p>
+      </div>
+
+      <div class="flex justify-center items-center gap-2">
+        <!-- Filter Button -->
+        <div (click)="openFilterModal()"
+          class="cursor-pointer flex-none gap-2.5 flex justify-center items-center h-10 2xs:px-5 px-2.5 rounded-lg bg-themeblue-200 text-themeblue-900 hover:text-themeblue-800">
+          <i class='bx bx-filter-alt text-xl'></i>
+          <p class=" font-semibold text-base 2xs:block hidden">Filter</p>
+        </div>
+
+        <!-- Add Button -->
+        <button (click)="openAddUserForm($event)"
+          class="flex-none items-center gap-2.5 waves-effect flex justify-center h-10 w-10 rounded-lg bg-themeblue-200 text-themeblue-900 hover:text-themeblue-800">
+          <i class="bx bx-plus text-2xl  "></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Table -->
+  <div class="border-[0px] border-themeblue-900 w-full rounded-lg mt-5 shadow-[0_0px_12px_1px_rgba(0,0,0,0.1)]">
+    <div class="bg-white sticky top-0 rounded-t-lg border-b-[1px] border-themeblue-900">
+      <p class="text-left py-3 px-5 text-themeblue-900 text-2xl font-bold">USERS</p>
+    </div>
+
+    <div class="overflow-auto w-full h-max max-h-[50vh]">
+
+      <table class="min-w-full whitespace-nowrap text-base  ">
+
+        <thead class="sticky top-[0px] bg-white" id="table-data">
+
+          <tr class="bg-themeblue-200 text-themeblue-900 shadow-[#111b7d_0px_1px_0px_0px]">
+            <th class="text-left py-1.5 px-2 pl-5 w-fit">
+              Sl No
+            </th>
+            <th class="text-left py-1.5 px-2 w-fit">
+              Status
+            </th>
+            <th class="text-left py-1.5 px-5">
+              Name
+            </th>
+            <th class="text-left py-1.5 px-5">Email address</th>
+            <th class="text-left py-1.5 px-5">
+              <div class="flex justify-start items-cente gap-2">
+                <p>Role</p>
+                <p *ngIf="roleFilter != defaultRoleFilter" class="text-danger">*</p>
+              </div>
+            </th>
+            <th class="text-left py-1.5 px-5">
+              <div class="flex justify-start items-cente gap-2">
+                <p>Create Date</p>
+                <p *ngIf="createDateFilter != null" class="text-danger">*</p>
+              </div>
+            </th>
+            <th class="text-left py-1.5 px-5"></th>
+          </tr>
+        </thead>
+        <tbody *ngFor="let userItem of userList; let i = index" class="divide-y divide-gray-200">
+          <tr class="hover:bg-themeblue-100">
+            <td class="py-3 px-2 pl-5">
+              <p>#{{i+1}}</p>
+            </td>
+            <td class="py-3 px-2">
+              <app-status-tag
+              [status]="userItem.isActive?'ACTIVE':'DISABLED'"
+              [color]="userItem.isActive?'success':'danger'"
+              />
+            </td>
+            <td class="py-3 px-5">
+              <div class="flex justify-start items-center gap-3">
+                <!-- <div
+                  class="floating-dropdown-btn rounded-full h-8 w-8 flex justify-center items-center bg-gradient-to-r from-themeblue-800 to-themeblue-900 duration-500">
+                  <p class="floating-dropdown-btn text-white text-lg font-semibold">
+                    {{userItem.name![0].toUpperCase()}}</p>
+                </div> -->
+                <p class="text-black font-semibold">{{userItem.name}}</p>
+              </div>
+            </td>
+            <td class="py-3 px-5">
+              <p>{{userItem.email}}</p>
+            </td>
+            <td class="py-3 px-5">
+              <p>{{userItem.role}}</p>
+            </td>
+            <td class="py-3 px-5">
+              <p>{{userItem.createDate | date }}</p>
+            </td>
+            <td class="py-3 px-5">
+              <div *ngIf="userItem.id != user.id; else youtag" class="flex justify-center items-center gap-5 text-xl">
+                <i (click)="opneUpdateUserForm(userItem)"
+                  class='bx bx-edit text-themeblue-400 cursor-pointer  p-2.5 rounded-full nav-link'></i>
+                <button *ngIf="userItem.isActive; else enableBtn" (click)="disableUser(userItem)"
+                  class=" py-2 sm:py-1 px-3 rounded text-danger text-sm shadow bg-red-100 w-fit">
+                  Disable
+                </button>
+                <ng-template #enableBtn>
+                  <button (click)="enableUser(userItem)"
+                    class=" py-2 sm:py-1 px-3 rounded text-white bg-success text-sm shadow w-fit">
+                    Enable
+                  </button>
+                </ng-template>
+              </div>
+              <ng-template #youtag>
+                <div class="flex justify-center items-center">
+                  <div
+                    class="flex justify-center items-center px-3 w-fit h-6 py-1.5 text-sm shadow text-themeblue-900 border-[2px] border-themeblue-900 rounded font-semibold hover:bg-themeblue-200">
+                    You
+                  </div>
+                </div>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+        <ng-template #loader>
+          <app-dot-wave-loader colorCode="#11153e"></app-dot-wave-loader>
+        </ng-template>
+      </table>
+    </div>
+  </div>
+
+  <!-- Paggination -->
+  <app-pagination-bar 
+  [recordPerPageOptions]="recordPerPageOptions"
+  [recordPerPage]="recordPerPage"
+  [pageNo]="pageNo"
+  [totalPageCount]="totalPageCount"
+  [disableFlag]="isGettingUser"
+  ></app-pagination-bar>
+</main>

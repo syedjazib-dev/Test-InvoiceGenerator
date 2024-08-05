@@ -1,0 +1,35 @@
+<!-- Main modal -->
+<div *ngIf="alert" [ngClass]="{'close-backdrop-animation': !isAlertBoxClosed}"
+    class="top-0 h-full bg-backdrop-900 fixed left-0 right-0 flex justify-center items-center open-backdrop-animation"
+    style="z-index: 51;">
+</div>
+<div style="z-index: 52;" *ngIf="alert"
+    class="bg-white rounded-lg shadow-lg open-sliding-animation fixed right-1/2 bottom-1/2 translate-y-2/4 translate-x-2/4 md:w-fit w-5/6  shadow-[0_0px_20px_1px_rgba(0,0,0,0.3)]"
+    [ngClass]="{'close-sliding-animation': !isAlertBoxClosed}">
+
+    <div class="flex items-start justify-between bg-themeblue-200 py-3.5 px-6 rounded-t-lg gap-6 border-b-[2px] border-gray-200">
+        <h2 class="text-lg font-semibold text-themeblue-900">{{alert!.title}}</h2>
+        <i (click)="onCloseAlertBox()"
+            class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-lg text-gray-800 nav-link focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link"></i>
+    </div>
+
+    <div class="py-0 px-6 mr-2">
+        <div
+            class="my-4 w-fit text-base py-1 px-2 rounded-lg">
+            {{alert!.msg}}
+        </div>
+        <div class="mb-4 flex sm:justify-end justify-between items-center gap-6 w-full">
+            <button (click)="onCancel($event)"
+                class="min-w-20 w-fit text-gray-700 py-1 px-2 sm:py-1.5 rounded transition-colors text-base font-semibold">
+                {{alert!.cancelBtnText}}
+            </button>
+            <button (click)="onOk($event)"
+                class="min-w-20 w-fit text-white py-1 px-2 sm:py-1.5 rounded transition-colors text-base"
+                [ngClass]="bgColor">
+                {{alert!.okBtnText}}
+            </button>
+        </div>
+    </div>
+
+</div>
+

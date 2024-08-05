@@ -1,0 +1,50 @@
+.open-sliding-msg-animation {
+    animation-name: open-msg;
+    animation-duration: 0.5s;
+    transform:  translatex(50%);
+    animation-timing-function: ease-out;
+}
+
+@keyframes open-msg {
+    from {
+        transform: translatex(50%) translateY(-200%);
+    }
+
+    to {
+        transform: translatex(50%) translateY(0%);
+    }
+}
+
+.close-sliding-msg-animation {
+    animation-name: close-msg;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in;
+}
+
+@keyframes close-msg {
+    from {
+        transform: translatex(50%) translateY(0%);
+    }
+
+    to {
+        transform: translatex(50%) translateY(-200%);
+    }
+}
+
+.loadingBar-animation{
+    animation-name: loadingBar;
+    animation-duration: 5s;
+    
+    animation-timing-function: linear;
+}
+
+
+@keyframes loadingBar {
+    from {
+       width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}

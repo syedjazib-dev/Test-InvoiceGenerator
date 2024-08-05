@@ -1,0 +1,7 @@
+<span class="relative">
+    <ng-content select="[floating-dropdown-title]"></ng-content>
+    <div [ngClass]="{hidden : !floatingDropdown.isFloatingDropdownOpen(floatingDropdownId)}"
+        class="" style="z-index: 50;">
+        <ng-content select="[floating-dropdown-menu]"></ng-content>
+    </div>
+</span>

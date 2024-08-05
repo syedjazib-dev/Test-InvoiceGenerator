@@ -1,0 +1,250 @@
+<!-- Print Modal -->
+<app-floating-modal [floatingModalId]="printInfoModelId" title="Print Info">
+    <form [formGroup]="printInfoForm" (ngSubmit)="print()" class="xs:w-80 w-full flex flex-col gap-4">
+        <app-input label="Reciever Name" [control]="reciever" name="Reciever Name" type="text" autocomplete="Name"
+            [isRequired]="true" placeholder="Name"></app-input>
+        <app-input label="Terms" [control]="terms" name="Terms" type="text" placeholder="Terms"></app-input>
+        <app-textarea label="Remarks" [control]="remarks" name="Remarks" type="text"
+            placeholder="Remarks"></app-textarea>
+
+        <button [disabled]="isPrinting" type="submit"
+            class="text-white py-2 sm:py-3 rounded bg-gradient-to-r from-themeblue-800 to-themeblue-900 w-full mt-2 text-base">
+            <app-dot-wave-loader colorCode="#FFFFFF" class="flex justify-center items-center my-1 mt-1.5"
+                *ngIf="isPrinting ; else Printtext" />
+            <ng-template #Printtext>
+                <div class="flex justify-center items-center gap-2">
+                    <i class='bx bx-printer text-xl'></i>
+                    Print
+                </div>
+            </ng-template>
+        </button>
+    </form>
+</app-floating-modal>
+
+
+<main class="sm:mx-14 mx-8 mt-8 mb-10">
+    <div class="flex w-full justify-end items-center gap-4 sm:flex-nowrap flex-wrap">
+        <div class="flex sm:justify-center sm:w-fit w-full justify-between items-center gap-2 ">
+            <!-- Edit Button -->
+            <div *ngIf="invoice.status != InvoiceStatus.Paid" (click)="openLink($event, 'invoices/i', invoice.id!.toString())"
+                class="cursor-pointer flex-none gap-2.5 flex justify-center items-center h-10 2xs:px-5 px-2.5 rounded-lg bg-themeblue-200 text-themeblue-900 hover:text-themeblue-800">
+                <i class='bx bx-edit text-xl'></i>
+                <p class="font-semibold text-base 2xs:block hidden">Edit</p>
+            </div>
+            <!-- Print Button -->
+            <div (click)="onpenPrintModal()"
+                class="cursor-pointer flex-none gap-2.5 flex justify-center items-center h-10 2xs:px-5 px-2.5 rounded-lg bg-themeblue-200 text-themeblue-900 hover:text-themeblue-800">
+                <i class='bx bx-printer text-xl'></i>
+                <p class="font-semibold text-base 2xs:block hidden">Print</p>
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="flex flex-col justify-between items-center gap-4 shadow-[0_0px_20px_1px_rgba(0,0,0,0.1)] rounded-xl mt-5">
+
+        <div
+            class="rounded-t-xl sm:px-8 px-4 p-4 flex justify-between items-center text-themeblue-900 text-2xl font-bold w-full    bg-themeblue-200 ">
+            <p>INVOICE</p>
+            <p>#{{invoice.invoiceNo!}}</p>
+        </div>
+
+        <div class="sm:px-8 px-4 py-3 pb-8 flex flex-col w-full">
+
+            <div class="flex justify-between items-start sm:flex-nowrap flex-wrap w-full 2xs:gap-4 gap-2 mb-6">
+               <span
+                    [ngClass]="{'border-success text-success':invoice.status == InvoiceStatus.Paid, 'border-danger text-danger':invoice.status != InvoiceStatus.Paid}"
+                    class="px-2 border py-0.5 inline-block rounded font-semibold text-base">
+                    {{invoice.status == InvoiceStatus.Paid?"PAID":'PENDING'}}
+                </span>
+                    <div *ngIf="invoice.status == InvoiceStatus.Paid"
+                        class="flex justify-center items-center sm:w-64 w-full py-1.5 border-[2px] border-themeblue-250 rounded-lg bg-themeblue-200 text-gray-600 font-[500] gap-3 text-base">
+                        <p class="tetx-sm">PAIED ON&nbsp;: &nbsp;{{invoice.paymentDate | date: 'MMMM dd, yyyy'}}</p>
+                    </div>
+            </div>
+
+            <div class="flex justify-between items-start sm:flex-nowrap flex-wrap w-full gap-10">
+                <div class="flex flex-col justify-center tems-start sm:w-64 w-full">
+                    <p>GENERATE/UPDATED BY</p>
+                    <p class="text-2xl font-bold text-themeblue-900 sm:mt-4 mt-2">{{invoice.salesman!.name}}</p>
+                    <p class="text-[15px] text-gray-600">{{invoice.salesman!.email}}</p>
+                    <p class="text-base text-gray-800 mt-2">Role : {{invoice.salesman!.role}}</p>
+                </div>
+                <div class="flex flex-col justify-center items-start sm:w-64 sm:flex-nowrap flex-wrap w-full">
+                    <p>INVOICE TO</p>
+                    <p class="text-2xl font-bold text-themeblue-900 sm:mt-4 mt-2">{{invoice.customer!.name}}</p>
+                    <p *ngIf="invoice.customer!.email != ''" class="text-sm text-gray-800 text-[15px]">
+                        {{invoice.customer!.email}}
+                    </p>
+                    <p *ngIf="invoice.customer!.trn != ''" class="mt-2 text-gray-800 font-semibold text-[15px]">
+                        TRN: {{invoice.customer!.trn}}
+                    </p>
+                    <p class="text-gray-800 font-semibold mt-2 text-[15px]">{{invoice.customer!.address}}</p>
+                    <p class="text-gray-800 font-semibold mt-2 text-[15px]">{{invoice.customer!.phone}}</p>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mt-8 sm:flex-nowrap flex-wrap w-full gap-6">
+                <div class="w-full  sm:w-fit">
+                    <p class="mb-1">CREATED ON</p>
+                    <div
+                        class="flex justify-center items-center sm:w-64 w-full py-1.5 border-[2px] border-themeblue-250 rounded-lg bg-themeblue-200 text-gray-600 font-[500] gap-3 text-base">
+                        <i class="ph ph-calendar text-2xl"></i>
+                        <p>{{invoice.createDate | date: 'MMMM dd, yyyy'}}</p>
+                    </div>
+                </div>
+                <div *ngIf="invoice.updateDate" class="w-full  sm:w-fit">
+                    <p class="mb-1">UPDATED ON</p>
+                    <div
+                        class="flex justify-center items-center sm:w-64 w-full py-1.5 border-[2px] border-themeblue-250 rounded-lg bg-themeblue-200 text-gray-600 font-[500] gap-3 text-base">
+                        <i class="ph ph-calendar text-2xl"></i>
+                        <p>{{invoice.updateDate | date: 'MMMM dd, yyyy'}}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="border-[0px] border-themeblue-900 w-full rounded-lg mt-5 shadow-[0_0px_12px_1px_rgba(0,0,0,0.1)]">
+                <div class="bg-white sticky top-0 rounded-t-lg border-b-[1px] border-themeblue-900">
+                  <p class="text-left py-3 px-5 text-themeblue-900 text-2xl font-bold">ITEMS</p>
+                </div>
+            
+                <div class="overflow-auto w-full h-max max-h-[50vh]">
+            
+                  <table class="min-w-full whitespace-nowrap text-base  ">
+            
+                    <thead class="sticky top-[0px] bg-white" id="table-data">
+            
+                      <tr class="bg-themeblue-200 text-themeblue-900 shadow-[#111b7d_0px_1px_0px_0px]">
+                                <th class="text-left py-1.5 px-2 pl-5 w-fit">
+                                    Sr. No.
+                                </th>
+                                <th class="text-left py-1.5 px-2 w-fit">
+                                    Description
+                                </th>
+                                <th class="text-left py-1.5 px-5">
+                                    Lot No.
+                                </th>
+                                <th class="text-left py-1.5 px-5">
+                                    <div class="flex justify-start items-cente gap-2">
+                                        <p>Quantity</p>
+                                    </div>
+                                </th>
+                                <th class="text-left py-1.5 px-5">
+                                    <div class="flex justify-start items-cente gap-2">
+                                        <p>Price</p>
+                                    </div>
+                                </th>
+                                <th class="text-left py-1.5 px-5">
+                                    <div class="flex justify-start items-cente gap-2">
+                                        <p>Amount</p>
+                                    </div>
+                                </th>
+                                <th class="text-left py-1.5 px-5">
+                                    <div class="flex justify-start items-cente gap-2">
+                                        Vat&nbsp;{{Vat.vatPr}}%
+                                    </div>
+                                </th>
+                                <th class="text-left py-1.5 px-5">
+                                    <div class="flex justify-start items-cente gap-2">
+                                        <p>Total Amount</p>
+                                    </div>
+                                </th>
+                                <th class="text-left py-1.5 px-5">
+                                    <div class="flex justify-start items-cente gap-2">
+                                        <p>Status</p>
+                                    </div>
+                                </th>
+                                <th class="text-left py-1.5 px-5">
+                                    <div class="flex justify-start items-cente gap-2">
+                                        <p>Updated On</p>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody *ngFor="let item of invoiceItems; let i = index" class="divide-y divide-gray-200">
+                            <tr class="hover:bg-themeblue-100">
+                                <td class="py-3 px-2 pl-5">
+                                    <p>#{{i+1}}</p>
+                                </td>
+                                <td class="py-3 px-2">
+                                    <div class="flex justify-start items-center">
+                                        <p class="text-black font-semibold">{{item.description}}</p>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-5">
+                                    <div class="flex justify-start items-center ">
+                                        <p class="">{{item.lotNo == '' ? '--' : item.lotNo}}</p>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-5">
+                                    <p class="text-gray-800 font-semibold">{{item.weightCarats}}&nbsp;&nbsp;<span
+                                            class="text-sm text-gray-500 font-normal">{{item.quantityUnit}}</span>
+                                    </p>
+                                </td>
+                                <td class="py-3 px-5">
+                                    <p class="text-gray-800 font-semibold">{{item.pricePerUnit}}&nbsp;&nbsp;<span
+                                            class="text-sm text-gray-500 font-normal">{{item.pricePerUnitCurrancy}}</span>
+                                    </p>
+                                </td>
+                                <td class="py-3 px-5">
+                                    <p class="text-gray-800 font-semibold">{{item.amount}}&nbsp;&nbsp;<span
+                                            class="text-sm text-gray-500 font-normal">AED</span></p>
+                                </td>
+                                
+                                <td class="py-3 px-5">
+                                    <p class="text-gray-800 font-semibold">{{item.vat}}&nbsp;&nbsp;<span
+                                            class="text-sm text-gray-500 font-normal">AED</span></p>
+                                </td>
+                                <td class="py-3 px-5">
+                                    <p class="text-gray-800 font-semibold">{{item.amountIncludingVat}}&nbsp;&nbsp;<span
+                                            class="text-sm text-gray-500 font-normal">AED</span></p>
+                                </td>
+                                <td class="py-3 px-2">
+                                    <app-status-tag 
+                                    [status]="item.status" 
+                                    [color]="item.status == ItemStatus.Billed ? 'success'
+                                            : item.status == ItemStatus.Pending ? 'danger'
+                                            : item.status == ItemStatus.Returned ? 'secondary'
+                                            : item.status == ItemStatus.Splitted ? 'primary' : 'danger'" />
+                                </td>
+                                <td class="py-3 px-5">
+                                    <div class="flex justify-start items-center ">
+                                        <p class="">{{item.updateDate ? (item.updateDate | date: 'MMMM dd, yyyy') : '' }}</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Total -->
+            <div class="flex sm:justify-end justify-center items-center w-full sm:px-16 px-0 mt-6">
+                <div class="grid grid-cols-2 items-center justify-end gap-2 sm:gap-x-12 sm:w-fit w-full">
+                    <div class="flex sm:justify-end justify-between items-center">
+                        <p class="text-base font-bold">Subtotal</p>
+                    </div>
+                    <div class="flex justify-end items-center">
+                        <p class="xs:text-xl text-lg font-bold text-themeblue-900">
+                            {{invoice.totalAmount.toFixed(2)}}&nbsp;<span class="text-base">AED</span></p>
+                    </div>
+                    <div class="flex sm:justify-end justify-between items-center">
+                        <p class="text-base font-bold">VAT@&nbsp;{{Vat.vatPr}}%</p>
+                    </div>
+                    <div class="flex justify-end items-center ">
+                        <p class="text-lg font-bold">{{invoice.vat.toFixed(2)}}&nbsp;<span class="text-base">AED</span>
+                        </p>
+                    </div>
+                    <div class="flex sm:justify-end justify-between items-center ">
+                        <p class="text-lg font-bold">Total</p>
+                    </div>
+                    <div class="flex justify-end items-center">
+                        <p class="xs:text-xl text-lg font-bold text-themeblue-900">
+                            {{invoice.totalAmountIncludingVat.toFixed(2)}}&nbsp;<span class="text-base">AED</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

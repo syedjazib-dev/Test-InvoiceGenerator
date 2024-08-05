@@ -1,0 +1,22 @@
+<!-- Main modal -->
+<div *ngIf="floatingMoadal.isFloatingModalOpen(floatingModalId)" appEventBlocker
+    [ngClass]="{'close-backdrop-animation': !isFloatingModalClosed}"
+    class="top-0 h-full bg-backdrop-900 fixed left-0 right-0 flex justify-center items-center open-backdrop-animation"
+    style="z-index: 51;">
+</div>
+<div style="z-index: 52;"
+    class="py-4 px-6 bg-white rounded-lg shadow-lg open-sliding-animation fixed right-1/2 bottom-1/2 translate-y-2/4 translate-x-2/4 xs:w-fit w-5/6"
+    *ngIf="floatingMoadal.isFloatingModalOpen(floatingModalId)"
+    [ngClass]="{'close-sliding-animation': !isFloatingModalClosed}">
+
+    <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-themeblue-900">{{title}}</h2>
+        <i (click)="closeFloatingModal()"
+            class="bx bx-x text-2xl inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-lg text-themeblue-900 hover:text-themeblue-800 hover:bg:text-themeblur-200 focus:outline-none focus:ring-offset-2 focus:ring-offset-white nav-link "></i>
+    </div>
+
+    <div class="mt-4">
+        <ng-content ></ng-content>
+    </div>
+
+</div>

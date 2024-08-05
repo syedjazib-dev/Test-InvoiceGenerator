@@ -1,0 +1,66 @@
+.open-sliding-animation {
+    animation-name: open-float-modal;
+    animation-duration: 0.5s;
+    transform:  translatex(50%) translatey(50%);
+    animation-timing-function: ease-out;
+}
+
+@keyframes open-float-modal {
+    from {
+        transform: translatex(50%) translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translatex(50%) translateY(50%);
+        opacity: 1;
+    }
+}
+
+.close-sliding-animation {
+    animation-name: close-float-modal;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in;
+}
+
+@keyframes close-float-modal {
+    from {
+        transform: translatex(50%) translateY(50%);
+        opacity: 1;
+    }
+
+    to {
+        transform: translatex(50%) translateY(-100%);
+        opacity: 0;
+    }
+}
+
+.open-backdrop-animation {
+    animation-name: open-backdrop;
+    animation-duration: 0.5s;
+}
+
+@keyframes open-backdrop {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.close-backdrop-animation {
+    animation-name: close-backdrop;
+    animation-duration: 0.5s;
+}
+
+@keyframes close-backdrop {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}

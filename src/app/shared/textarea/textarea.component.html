@@ -1,0 +1,54 @@
+<div class="relative w-full">
+    <label *ngIf="label != ''" class="text-base text-gray-500">
+        {{label}}&nbsp;<span *ngIf="isRequired" class="text-danger">*</span>
+    </label>
+
+    <div class="flex justify-center items-center border-[2px] rounded-lg bg-white w-full"
+        [ngClass]="{'border-danger focus-within:border-danger':(control.touched && control.dirty && control.invalid), 'border-gray-200  focus-within:border-themeblue-800': !(control.touched && control.dirty && control.invalid)}">
+
+        <i *ngIf="prefixIcon != ''" [ngClass]="prefixIcon" class=" text-base pl-2"></i>
+        <span *ngIf="prefixText != ''" class=" text-xl pl-2">{{prefixText}}</span>
+        <textarea [formControl]="control"  [value]="value" 
+            class="w-full px-3 py-2 sm:px-4 sm:py-2 border-0 rounded-lg  login-text-color border-transparent focus:border-transparent text-black bg-white text-base"
+            placeholder={{placeholder}} [mask]="format" [autocomplete]="autocomplete" >
+            </textarea>
+        <span *ngIf="postfixText != ''" class=" text-base pr-2">{{postfixText}}</span>
+        <i *ngIf="postfixIcon != ''" [ngClass]="postfixIcon" class=" text-base pr-2"></i>
+        <i *ngIf="control.touched && control.dirty && control.invalid" (mouseover)="showError = true"
+            (mouseout)="showError = false" class="ph ph-warning-circle text-danger text-xl pr-2 cursor-pointer"></i>
+    </div>
+
+    <div *ngIf="control.touched && control.dirty && control.invalid  && showError"
+        class="border-[1px] border-danger rounded-lg flex justify-start items-center px-4 py-1 bg-white shadow font-[500] absolute bottom-11 right-1   ">
+        <p ngClass="mt-1 mb-1 text-sm text-red-600" *ngIf="control.errors?.['required']" class="text-red-400">
+            {{name}} is required
+        </p>
+
+        <p ngClass="mt-1 mb-1 text-red-600" *ngIf="control.errors?.['minlength']" class="text-red-400">
+            {{name}} length should be minimum {{control.errors?.['minlength'].requiredLength}}
+        </p>
+
+        <p ngClass="mt-1 mb-1 text-red-600" *ngIf="control.errors?.['email']" class="text-red-400">
+            Enter valid email
+        </p>
+
+        <p ngClass="mt-1 mb-1 text-red-600" *ngIf="control.errors?.['min']" class="text-red-400">
+            Value is to low
+        </p>
+
+        <p ngClass="mt-1 mb-1 text-red-600" *ngIf="control.errors?.['max']" class="text-red-400">
+            Value is to high
+        </p>
+
+        <p ngClass="mt-1 mb-1 text-red-600" *ngIf="control.errors?.['pattern']" class="text-red-400">
+            Password must be minimum 8 characters long and
+            must contain 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character
+        </p>
+        <p ngClass="mt-1 mb-1 text-red-600" *ngIf="control.errors?.['noMatch']" class="text-red-400">
+            Confirm password not matching
+        </p>
+        <p ngClass="mt-1 mb-1 text-red-600" *ngIf="control.errors?.['emailTaken']" class="text-red-400">
+            Email already teken, Please try another email
+        </p>
+    </div>
+</div>

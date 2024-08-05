@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'boxicons';
+
+
+/* body{
+    font-family: saira, sans-serif;
+} */
+
+body {
+    -webkit-user-select: none;
+    /* Safari */
+    -ms-user-select: none;
+    /* IE 10 and IE 11 */
+    user-select: none;
+    /* Standard syntax */
+}
+
+/* SCROLL BAR */
+
+:root {
+    --scrollbar-track-color: transparent;
+    --scrollbar-color: #d1d5db;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-color);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-color);
+    border-radius: 20px;
+}
